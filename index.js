@@ -10,6 +10,7 @@ const bodyParser  = require( 'body-parser' ),
 
 mongoose.Promise = global.Promise;
 mongoose.connect( config.dbUrl, {
+  useCreateIndex: true,
   useNewUrlParser: true,
   autoReconnect  : true
 }, ( err ) => {

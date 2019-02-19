@@ -1,9 +1,6 @@
 const mongoose = require( "mongoose" );
 
 const schema = mongoose.Schema( {
-  _id         : {
-    type : ObjectId
-  },
   status      : {
     type     : String,
     required : true,
