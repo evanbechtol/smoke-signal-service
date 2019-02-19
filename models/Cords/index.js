@@ -38,6 +38,11 @@ const schema = mongoose.Schema( {
     type     : Object,
     required : true,
     index    : true
+  },
+  title: {
+    type: String,
+    required: true,
+    index: true
   }
 } );
 
