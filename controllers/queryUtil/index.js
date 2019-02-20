@@ -1,5 +1,7 @@
+const logger = require( "../../config/logger" );
+
 function getDbQueryStrings ( queryString ) {
-  let query     = {},
+  let query     = queryString.query || {},
       searchStr = queryString.searchstr || null,
       sort      = queryString.sort || null,
       skip      = Number( queryString.skip ) || 0,
@@ -9,7 +11,17 @@ function getDbQueryStrings ( queryString ) {
     searchStr = searchStr.toLowerCase();
   }
 
-  return { searchStr, skip, limit, sort };
+  if ( query && typeof query === "string" ) {
+      try {
+        query = JSON.parse( query );
+        console.log( query );
+      } catch ( e ) {
+        logger.error( { error: e, query } );
+        console.log( query );
+      }
+  }
+
+  return { query, searchStr, skip, limit, sort };
 }
 
 module.exports = { getDbQueryStrings };

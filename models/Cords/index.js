@@ -4,7 +4,8 @@ const schema = mongoose.Schema( {
   status      : {
     type     : String,
     required : true,
-    index    : true
+    index    : true,
+    default  : "Open"
   },
   description : {
     type    : String,
