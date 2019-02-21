@@ -5,7 +5,7 @@ function getDbQueryStrings ( queryString ) {
       searchStr = queryString.searchstr || null,
       sort      = queryString.sort || null,
       skip      = Number( queryString.skip ) || 0,
-      limit     = Number( queryString.limit ) || 10;
+      limit     = Number( queryString.limit ) || 100;
 
   if ( searchStr ) {
     searchStr = searchStr.toLowerCase();
