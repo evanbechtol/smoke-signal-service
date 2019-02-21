@@ -18,7 +18,7 @@ const schema = mongoose.Schema( {
   },
   openedOn    : {
     type    : Date,
-    default : new Date()
+    required: true
   },
   resolvedOn  : {
     type : Date

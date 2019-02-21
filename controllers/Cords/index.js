@@ -9,6 +9,7 @@ const cordsKeyWhitelist = [
   "category",
   "puller",
   "rescuers",
+  "openedOn",
   "title"
 ];
 
