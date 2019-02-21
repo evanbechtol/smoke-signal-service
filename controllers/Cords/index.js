@@ -19,6 +19,7 @@ function getCords ( req, res ) {
 
   Cords
       .find( queryStrings.query )
+      .select( { __v: 0, description: 0 } )
       .sort( queryStrings.sort )
       .limit( queryStrings.limit )
       .exec( function ( err, results ) {
