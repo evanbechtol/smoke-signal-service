@@ -57,6 +57,7 @@ function getCordByStatus ( req, res ) {
       } );
 }
 
+// Todo: create callback to send notification when cord created
 function createCord ( req, res ) {
   if ( req.body ) {
     const body = objectUtil.whitelist( req.body, cordsKeyWhitelist );
