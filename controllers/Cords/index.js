@@ -79,6 +79,7 @@ function updateCord ( req, res ) {
   const updateCordWhitelist = [
     "status",
     "description",
+    "discussion",
     "app",
     "category",
     "rescuers",
@@ -87,7 +88,7 @@ function updateCord ( req, res ) {
   if ( _id && req.body ) {
     const body = objectUtil.whitelist( req.body, updateCordWhitelist );
     Cords
-        .findByIdAndUpdate( _id, body, { new: true } )
+        .findByIdAndUpdate( _id, body, { new : true } )
         .exec( function ( err, results ) {
           if ( err ) {
             return res.status( 500 ).send( resUtil.sendError( err ) );
