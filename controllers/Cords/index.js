@@ -103,7 +103,7 @@ function updateCord ( req, res ) {
 function updateRescuers ( req, res ) {
   const _id                 = req.query.id || req.params.id || null;
   const updateCordWhitelist = [ "rescuers" ];
-  if ( _id && req.body ) {
+  if ( _id && req.body && req.body.rescuers ) {
     const body = objectUtil.whitelist( req.body, updateCordWhitelist );
     Cords
         .findByIdAndUpdate( _id, { $addToSet : { "rescuers" : { $each : body.rescuers } } }, { new : true } )
