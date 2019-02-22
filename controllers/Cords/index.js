@@ -13,14 +13,14 @@ const cordsKeyWhitelist = [
   "title"
 ];
 
-module.exports = { getCords, getCordById, getCordByStatus, createCord, updateCord, deleteCord };
+module.exports = { getCords, getCordById, getCordByStatus, createCord, updateCord, updateRescuers, deleteCord };
 
 function getCords ( req, res ) {
   const queryStrings = qUtil.getDbQueryStrings( req.query );
 
   Cords
       .find( queryStrings.query )
-      .select( { __v: 0, description: 0 } )
+      .select( { __v : 0, description : 0 } )
       .sort( queryStrings.sort )
       .limit( queryStrings.limit )
       .exec( function ( err, results ) {
@@ -36,12 +36,11 @@ function getCordById ( req, res ) {
   const _id = req.query.id || req.params.id || null;
   Cords
       .findById( _id )
-      .exec( function ( err, results ) {
-        if ( err ) {
-          return res.status( 500 ).send( resUtil.sendError( err ) );
-        }
-
+      .then( results => {
         return res.send( resUtil.sendSuccess( results ) );
+      } )
+      .catch( err => {
+        return res.status( 500 ).send( resUtil.sendError( err ) );
       } );
 }
 
@@ -76,19 +75,46 @@ function createCord ( req, res ) {
 }
 
 function updateCord ( req, res ) {
-  const _id = req.query.id || req.params.id || null;
-
+  const _id                 = req.query.id || req.params.id || null;
+  const updateCordWhitelist = [
+    "status",
+    "description",
+    "app",
+    "category",
+    "rescuers",
+    "title"
+  ];
   if ( _id && req.body ) {
-    const body = objectUtil.whitelist( req.body, cordsKeyWhitelist );
-
+    const body = objectUtil.whitelist( req.body, updateCordWhitelist );
     Cords
-        .findOneAndUpdate( { _id }, body )
+        .findByIdAndUpdate( _id, body, { new: true } )
         .exec( function ( err, results ) {
           if ( err ) {
             return res.status( 500 ).send( resUtil.sendError( err ) );
           }
 
           return res.send( resUtil.sendSuccess( results ) );
+        } );
+  } else {
+    return res.status( 400 ).send( resUtil.sendError( "Request ID or Body was not provided" ) );
+  }
+}
+
+function updateRescuers ( req, res ) {
+  const _id                 = req.query.id || req.params.id || null;
+  const updateCordWhitelist = [ "rescuers" ];
+  if ( _id && req.body ) {
+    const body = objectUtil.whitelist( req.body, updateCordWhitelist );
+    Cords
+        .findByIdAndUpdate( _id, { $addToSet : { "rescuers" : { $each : body.rescuers } } }, { new : true } )
+        .then( results => {
+          if ( !results ) {
+            return res.status( 404 ).send( resUtil.sendError( "Document not found matching provided ID" ) );
+          }
+          return res.send( resUtil.sendSuccess( results ) );
+        } )
+        .catch( err => {
+          return res.status( 500 ).send( resUtil.sendError( err ) );
         } );
   } else {
     return res.status( 400 ).send( resUtil.sendError( "Request ID or Body was not provided" ) );
