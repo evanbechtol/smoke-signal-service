@@ -50,5 +50,11 @@ mongoose.connect( config.dbUrl, {
   io.origins( "*:*" );
   io.on( "connection", function ( socket ) {
     logger.info( "a user connected" );
+
+    require( "./controllers/Socket")(io, socket);
+
+    socket.on( "disconnect", function () {
+      logger.info( "a user disconnected" );
+    } );
   } );
 } );

@@ -1,6 +1,6 @@
 const logger = require( "../../config/logger" );
 
-function getDbQueryStrings ( queryString ) {
+function getDbQueryStrings ( queryString = {}) {
   let query     = queryString.query || {},
       searchStr = queryString.searchstr || null,
       sort      = queryString.sort || null,
