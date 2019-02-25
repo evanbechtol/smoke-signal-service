@@ -45,10 +45,18 @@ const schema = mongoose.Schema( {
     required : true,
     index    : true
   },
-  rescuers    : {
-    type    : Array,
-    default : []
-  },
+  rescuers    : [
+    {
+      _id: {
+        type: String,
+        required: true
+      },
+      username: {
+        type: String,
+        required: true
+      }
+    }
+  ],
   puller      : {
     type     : Object,
     required : true,
