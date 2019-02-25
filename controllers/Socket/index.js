@@ -5,28 +5,30 @@ const resUtil    = require( "../../util/responseUtil" );
 const objectUtil = require( "../../util" );
 
 module.exports = ( io, socket ) => {
-  socket.on( "REFRESH_GRID", function ( socket ) {
-    const queryStrings = qUtil.getDbQueryStrings( socket.query || {} );
-
-    Cords
-        .find( queryStrings.query )
-        .select( { __v : 0, description : 0 } )
-        .sort( queryStrings.sort )
-        .limit( queryStrings.limit )
-        .exec( function ( err, results ) {
-          io.emit( "SOCKET_REFRESH_GRID", results );
+  socket.on( "REFRESH_GRID", function ( socket = {} ) {
+    getCords( socket )
+        .then( response => {
+          io.emit( "SOCKET_REFRESH_GRID", response );
+        } )
+        .catch( err => {
+          logger.error( `Error refreshing grid: ${err}` );
+          io.emit( "SOCKET_REFRESH_ERROR", err );
         } );
   } );
 
-  socket.on( "REFRESH_ITEM", function ( socket ) {
-    const _id = socket._id || null;
+  socket.on( "REFRESH_ITEM", function ( _id ) {
     Cords
         .findById( _id )
         .then( results => {
           io.emit( "SOCKET_REFRESH_ITEM", results );
+          return getCords({})
         } )
+        .then( gridItems => {
+          io.emit( "SOCKET_REFRESH_GRID", gridItems );
+        })
         .catch( err => {
-          logger.error( `Error refreshing item: ${err}`);
+          logger.error( `Error refreshing item: ${err}` );
+          io.emit( "SOCKET_REFRESH_ERROR", err );
         } );
   } );
 
@@ -34,3 +36,21 @@ module.exports = ( io, socket ) => {
     logger.info( "Discussion Refresh called" );
   } );
 };
+
+function getCords ( query = {} ) {
+  return new Promise( ( resolve, reject ) => {
+    const queryStrings = qUtil.getDbQueryStrings( query || {} );
+
+    Cords
+        .find( queryStrings.query )
+        .select( { __v : 0, description : 0 } )
+        .sort( queryStrings.sort )
+        .limit( queryStrings.limit )
+        .exec( function ( err, results ) {
+          if ( err ) {
+            return reject( err );
+          }
+          return resolve( results );
+        } );
+  } );
+}
