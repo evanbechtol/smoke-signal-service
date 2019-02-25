@@ -1,10 +1,19 @@
-const logger     = require( "../../config/logger" );
-const Cords      = require( "../../models/Cords" );
-const qUtil      = require( "../../util/queryUtil" );
-const resUtil    = require( "../../util/responseUtil" );
-const objectUtil = require( "../../util" );
+const logger = require( "../../config/logger" );
+const Cords  = require( "../../models/Cords" );
+const qUtil  = require( "../../util/queryUtil" );
 
 module.exports = ( io, socket ) => {
+  socket.on( "JOIN_ITEM_ROOM", function ( room ) {
+    logger.info(`User joined item room ${room}`);
+    socket.join( room );
+  } );
+
+  socket.on( "LEAVE_ITEM_ROOM", function ( room ) {
+    socket.leave( room, () => {
+      logger.info(`User left item room ${room}`);
+    } );
+  } );
+
   socket.on( "REFRESH_GRID_ONE", function ( data = {} ) {
     getCords( data )
         .then( response => {
@@ -32,6 +41,7 @@ module.exports = ( io, socket ) => {
         .findById( _id )
         .then( results => {
           socket.emit( "SOCKET_REFRESH_ITEM", results );
+          io.sockets.to(_id).emit("SOCKET_REFRESH_ITEM", results);
           return getCords( { query : { status : "Open" } } );
         } )
         .then( gridItems => {
