@@ -5,14 +5,25 @@ const resUtil    = require( "../../util/responseUtil" );
 const objectUtil = require( "../../util" );
 
 module.exports = ( io, socket ) => {
-  socket.on( "REFRESH_GRID", function ( socket = {} ) {
-    getCords( socket )
+  socket.on( "REFRESH_GRID_ONE", function ( data = {} ) {
+    getCords( data )
         .then( response => {
-          io.emit( "SOCKET_REFRESH_GRID", response );
+          socket.emit( "SOCKET_REFRESH_GRID_ONE", response );
         } )
         .catch( err => {
           logger.error( `Error refreshing grid: ${err}` );
-          io.emit( "SOCKET_REFRESH_ERROR", err );
+          socket.emit( "SOCKET_REFRESH_ERROR", err );
+        } );
+  } );
+
+  socket.on( "REFRESH_GRID_ALL", function ( data = {} ) {
+    getCords( data )
+        .then( response => {
+          io.emit( "SOCKET_REFRESH_GRID_ALL", response );
+        } )
+        .catch( err => {
+          logger.error( `Error refreshing grid: ${err}` );
+          socket.emit( "SOCKET_REFRESH_ERROR", err );
         } );
   } );
 
@@ -20,15 +31,15 @@ module.exports = ( io, socket ) => {
     Cords
         .findById( _id )
         .then( results => {
-          io.emit( "SOCKET_REFRESH_ITEM", results );
-          return getCords({})
+          socket.emit( "SOCKET_REFRESH_ITEM", results );
+          return getCords( { query : { status : "Open" } } );
         } )
         .then( gridItems => {
-          io.emit( "SOCKET_REFRESH_GRID", gridItems );
-        })
+          io.emit( "SOCKET_REFRESH_GRID_ALL", gridItems );
+        } )
         .catch( err => {
           logger.error( `Error refreshing item: ${err}` );
-          io.emit( "SOCKET_REFRESH_ERROR", err );
+          socket.emit( "SOCKET_REFRESH_ERROR", err );
         } );
   } );
 
