@@ -48,6 +48,7 @@ function getCordByStatus ( req, res ) {
   const status = req.query.status || req.params.status || null;
   Cords
       .find( { status } )
+      .sort( { openedOn : -1 } )
       .exec( function ( err, results ) {
         if ( err ) {
           return res.status( 500 ).send( resUtil.sendError( err ) );

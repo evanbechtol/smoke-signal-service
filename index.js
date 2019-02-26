@@ -1,49 +1,60 @@
-const bodyParser  = require( 'body-parser' ),
-      config      = require( './config' ),
-      express     = require( 'express' ),
-      morgan      = require( 'morgan' ),
-      path        = require( 'path' ),
-      routes      = require( './routes' ),
-      compression = require( 'compression' ),
-      mongoose    = require( 'mongoose' ),
-      logger      = require( './config/logger');
+const bodyParser  = require( "body-parser" ),
+      config      = require( "./config" ),
+      express     = require( "express" ),
+      morgan      = require( "morgan" ),
+      path        = require( "path" ),
+      routes      = require( "./routes" ),
+      compression = require( "compression" ),
+      mongoose    = require( "mongoose" ),
+      logger      = require( "./config/logger" );
 
 mongoose.Promise = global.Promise;
 mongoose.connect( config.dbUrl, {
-  useCreateIndex: true,
-  useNewUrlParser: true,
-  autoReconnect  : true
+  useCreateIndex  : true,
+  useNewUrlParser : true,
+  autoReconnect   : true
 }, ( err ) => {
   if ( err ) {
     throw err;
   }
-  logger.info( 'Database connection successful' );
+  logger.info( "Database connection successful" );
 
 
   let app = express();
 
 // Setup views and pathing
-  app.set( 'view engine', config.viewEngine );
-  app.set( 'views', path.join( __dirname, 'public' ) );
+  app.set( "view engine", config.viewEngine );
+  app.set( "views", path.join( __dirname, "public" ) );
 
 // Serve static content
-  app.use( express.static( path.join( __dirname, 'public' ) ) );
+  app.use( express.static( path.join( __dirname, "public" ) ) );
 
 // Set up middleware
-  app.use( morgan( 'dev' ) );
+  app.use( morgan( "dev" ) );
   app.use( compression() );
   app.use( bodyParser.urlencoded( {
     extended : false,
-    limit    : '20mb'
+    limit    : "20mb"
   } ) );
-  app.use( bodyParser.json( { limit : '20mb' } ) );
+  app.use( bodyParser.json( { limit : "20mb" } ) );
 
-// Pass app to routes
+  // Pass app to routes
   routes( app );
 
-// Start application
-  app.listen( config.port, () => {
+  // Start application
+  const server = app.listen( config.port, () => {
     logger.info( `Express running, now listening on port ${config.port}` );
   } );
 
-});
+  const io = require( "socket.io" ).listen( server );
+  io.origins( "*:*" );
+  io.on( "connection", function ( socket ) {
+    logger.info( "a user connected" );
+
+    require( "./controllers/Socket")(io, socket);
+
+    socket.on( "disconnect", function () {
+      logger.info( "a user disconnected" );
+    } );
+  } );
+} );
