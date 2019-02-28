@@ -58,19 +58,29 @@ const schema = mongoose.Schema( {
     }
   ],
   puller      : {
-    type     : Object,
-    required : true,
-    index    : true
+    _id: {
+      type: String,
+      required: true
+    },
+    username: {
+      type: String,
+      required: true
+    },
   },
   title       : {
     type     : String,
     required : true,
     index    : true
+  },
+  likes: {
+    type: Number,
+    default: 0
   }
 } );
 
 schema.index( { app : 1, category : 1 } );
 schema.index( { app : 1, category : 1, status : 1 } );
 schema.index( { category : 1, status : 1 } );
+schema.index( { puller: 1 } );
 
 module.exports = mongoose.model( "Cords", schema );

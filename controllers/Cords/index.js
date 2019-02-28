@@ -2,6 +2,7 @@ const Cords             = require( "../../models/Cords" );
 const qUtil             = require( "../../util/queryUtil" );
 const resUtil           = require( "../../util/responseUtil" );
 const objectUtil        = require( "../../util" );
+const logger            = require( "../../config/logger" );
 const cordsKeyWhitelist = [
   "status",
   "description",
@@ -13,7 +14,16 @@ const cordsKeyWhitelist = [
   "title"
 ];
 
-module.exports = { getCords, getCordById, getCordByStatus, createCord, updateCord, updateRescuers, deleteCord };
+module.exports = {
+  getCords,
+  getCordById,
+  getCordByStatus,
+  getCordForUser,
+  createCord,
+  updateCord,
+  updateRescuers,
+  deleteCord
+};
 
 function getCords ( req, res ) {
   const queryStrings = qUtil.getDbQueryStrings( req.query );
@@ -48,6 +58,28 @@ function getCordByStatus ( req, res ) {
   const status = req.query.status || req.params.status || null;
   Cords
       .find( { status } )
+      .sort( { openedOn : -1 } )
+      .exec( function ( err, results ) {
+        if ( err ) {
+          return res.status( 500 ).send( resUtil.sendError( err ) );
+        }
+
+        return res.send( resUtil.sendSuccess( results ) );
+      } );
+}
+
+function getCordForUser ( req, res ) {
+  let user = req.query.user || req.params.user || null;
+
+  try {
+    user = JSON.parse( user );
+  } catch ( e ) {
+    logger.error( `Error parsing user object: ${user}` );
+    return res.status( 500 ).send( resUtil.sendError( "Invalid JSON object provided" ) );
+  }
+
+  Cords
+      .find( { puller : user } )
       .sort( { openedOn : -1 } )
       .exec( function ( err, results ) {
         if ( err ) {

@@ -55,6 +55,14 @@ router.delete( "/:id", cordController.deleteCord );
 router.get( "/status/:status", cordController.getCordByStatus );
 
 /**
+ * @method GET
+ * @description Retrieve documents matching the user provided
+ * @param status {string} Status of the documents to retrieve
+ * @returns Status code 200 if successful with retrieved documents, 500 if error occurs
+ */
+router.get( "/user/:user", cordController.getCordForUser );
+
+/**
  * @method PUT
  * @description Update a cord's rescuers, provided that all required keys are provided
  * @param id {string} Object ID of document to update
