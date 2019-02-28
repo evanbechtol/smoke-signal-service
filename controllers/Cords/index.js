@@ -70,6 +70,7 @@ function getCordByStatus ( req, res ) {
 
 function getCordForUser ( req, res ) {
   let user = req.query.user || req.params.user || null;
+  let status = req.query.status || req.params.status || "Open";
 
   try {
     user = JSON.parse( user );
@@ -79,7 +80,7 @@ function getCordForUser ( req, res ) {
   }
 
   Cords
-      .find( { puller : user } )
+      .find( { puller : user, status }, { __v: 0 } )
       .sort( { openedOn : -1 } )
       .exec( function ( err, results ) {
         if ( err ) {

@@ -82,5 +82,6 @@ schema.index( { app : 1, category : 1 } );
 schema.index( { app : 1, category : 1, status : 1 } );
 schema.index( { category : 1, status : 1 } );
 schema.index( { puller: 1 } );
+schema.index( { puller: 1, status: 1 } );
 
 module.exports = mongoose.model( "Cords", schema );
