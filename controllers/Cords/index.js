@@ -156,7 +156,8 @@ function updateCord ( req, res ) {
     "app",
     "category",
     "rescuers",
-    "title"
+    "title",
+    "tags"
   ];
   if ( _id && req.body ) {
     const body = objectUtil.whitelist( req.body, updateCordWhitelist );
