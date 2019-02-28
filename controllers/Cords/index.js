@@ -19,6 +19,7 @@ module.exports = {
   getCordById,
   getCordByStatus,
   getCordForUser,
+  getUserStats,
   createCord,
   updateCord,
   updateRescuers,
@@ -69,7 +70,7 @@ function getCordByStatus ( req, res ) {
 }
 
 function getCordForUser ( req, res ) {
-  let user = req.query.user || req.params.user || null;
+  let user   = req.query.user || req.params.user || null;
   let status = req.query.status || req.params.status || "Open";
 
   try {
@@ -80,7 +81,7 @@ function getCordForUser ( req, res ) {
   }
 
   Cords
-      .find( { puller : user, status }, { __v: 0 } )
+      .find( { puller : user, status }, { __v : 0 } )
       .sort( { openedOn : -1 } )
       .exec( function ( err, results ) {
         if ( err ) {
@@ -88,6 +89,41 @@ function getCordForUser ( req, res ) {
         }
 
         return res.send( resUtil.sendSuccess( results ) );
+      } );
+}
+
+function getUserStats ( req, res ) {
+  let user = req.query.user || req.params.user || null;
+
+  try {
+    user = JSON.parse( user );
+  } catch ( e ) {
+    logger.error( `Error parsing user object: ${user}` );
+    return res.status( 500 ).send( resUtil.sendError( "Invalid JSON object provided" ) );
+  }
+  let stats = {};
+
+  Cords
+      .count( { puller : user } )
+      .then( cordCount => {
+        stats.cordsPulled = cordCount;
+        return Cords.count( { rescuers : user } );
+      } )
+      .then( rescuedCount => {
+        stats.rescuesProvided = rescuedCount;
+        return Cords.aggregate( [
+          { $match : { puller : user } },
+          { $group : { _id : "$app", count : { $sum : 1 } } },
+          { $sort : { count : -1 } },
+          { $limit : 1 },
+        ] );
+      } )
+      .then( appArray => {
+        stats.mostActiveApp = appArray[0];
+        return res.send( resUtil.sendSuccess( stats ) );
+      } )
+      .catch( err => {
+        return res.status( 500 ).send( resUtil.sendError( err ) );
       } );
 }
 

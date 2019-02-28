@@ -57,10 +57,18 @@ router.get( "/status/:status", cordController.getCordByStatus );
 /**
  * @method GET
  * @description Retrieve documents matching the user provided
- * @param status {string} Status of the documents to retrieve
+ * @param user {string} User object to retrieve cords for
  * @returns Status code 200 if successful with retrieved documents, 500 if error occurs
  */
 router.get( "/user/:user", cordController.getCordForUser );
+
+/**
+ * @method GET
+ * @description Retrieve statistics for user matching ID provided
+ * @param status {string} User to retrieve statistics for
+ * @returns Status code 200 if successful with retrieved documents, 500 if error occurs
+ */
+router.get( "/stats/:user", cordController.getUserStats );
 
 /**
  * @method PUT
