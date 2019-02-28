@@ -75,6 +75,11 @@ const schema = mongoose.Schema( {
   likes: {
     type: Number,
     default: 0
+  },
+  tags: {
+    type: Array,
+    index: true,
+    default: []
   }
 } );
 

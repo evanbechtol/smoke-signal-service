@@ -11,7 +11,9 @@ const cordsKeyWhitelist = [
   "puller",
   "rescuers",
   "openedOn",
-  "title"
+  "title",
+  "likes",
+  "tags"
 ];
 
 module.exports = {
