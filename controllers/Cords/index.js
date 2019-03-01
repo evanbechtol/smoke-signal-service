@@ -117,11 +117,11 @@ function getUserStats ( req, res ) {
           { $match : { puller : user } },
           { $group : { _id : "$app", count : { $sum : 1 } } },
           { $sort : { count : -1 } },
-          { $limit : 1 },
+          { $limit : 1 }
         ] );
       } )
       .then( appArray => {
-        stats.mostActiveApp = appArray[0];
+        stats.mostActiveApp = appArray[ 0 ];
         return res.send( resUtil.sendSuccess( stats ) );
       } )
       .catch( err => {
@@ -156,6 +156,7 @@ function updateCord ( req, res ) {
     "app",
     "category",
     "rescuers",
+    "resolvedOn",
     "title",
     "tags"
   ];
