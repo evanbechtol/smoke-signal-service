@@ -1,4 +1,5 @@
 const express        = require( "express" );
+const auth           = require( "../../controllers/E-Auth" );
 const cordController = require( "../../controllers/Cords" );
 
 let router = express.Router();
@@ -11,7 +12,7 @@ let router = express.Router();
  * @param query {string} Optionally pass in to control the query performed by MonogDB
  * @returns Status code 200 and data if query successful. 500 if an error occurs
  */
-router.get( "/", cordController.getCords );
+router.get( "/", auth.validateApp, cordController.getCords );
 
 /**
  * @method POST
@@ -19,7 +20,7 @@ router.get( "/", cordController.getCords );
  * @param body {object} Object used to create the document
  * @returns Status code 200 if successful with created document, 500 if error occurs
  */
-router.post( "/", cordController.createCord );
+router.post( "/", auth.validateApp, cordController.createCord );
 
 /**
  * @method GET
@@ -27,7 +28,7 @@ router.post( "/", cordController.createCord );
  * @param id {string} Object ID of the Cord to retrieve
  * @returns Status code 200 if successful with retrieved document, 500 if error occurs
  */
-router.get( "/:id", cordController.getCordById );
+router.get( "/:id", auth.validateApp, cordController.getCordById );
 
 /**
  * @method PUT
@@ -35,7 +36,7 @@ router.get( "/:id", cordController.getCordById );
  * @param id {string} Object ID of document to update
  * @returns Status code 200 if successful with updated document, 500 if error occurs
  */
-router.put( "/:id", cordController.updateCord );
+router.put( "/:id", auth.validateApp, cordController.updateCord );
 
 
 /**
@@ -44,7 +45,7 @@ router.put( "/:id", cordController.updateCord );
  * @param id {string} Object ID of document to delete
  * @returns Status code 200 if successful with created document, 500 if error occurs
  */
-router.delete( "/:id", cordController.deleteCord );
+router.delete( "/:id", auth.validateApp, cordController.deleteCord );
 
 /**
  * @method GET
@@ -52,7 +53,7 @@ router.delete( "/:id", cordController.deleteCord );
  * @param status {string} Status of the documents to retrieve
  * @returns Status code 200 if successful with retrieved documents, 500 if error occurs
  */
-router.get( "/status/:status", cordController.getCordByStatus );
+router.get( "/status/:status", auth.validateApp, cordController.getCordByStatus );
 
 /**
  * @method GET
@@ -60,7 +61,7 @@ router.get( "/status/:status", cordController.getCordByStatus );
  * @param user {string} User object to retrieve cords for
  * @returns Status code 200 if successful with retrieved documents, 500 if error occurs
  */
-router.get( "/user/:user", cordController.getCordForUser );
+router.get( "/user/:user", auth.validateApp, cordController.getCordForUser );
 
 /**
  * @method GET
@@ -68,7 +69,7 @@ router.get( "/user/:user", cordController.getCordForUser );
  * @param status {string} User to retrieve statistics for
  * @returns Status code 200 if successful with retrieved documents, 500 if error occurs
  */
-router.get( "/stats/:user", cordController.getUserStats );
+router.get( "/stats/:user", auth.validateApp, cordController.getUserStats );
 
 /**
  * @method PUT
@@ -77,6 +78,6 @@ router.get( "/stats/:user", cordController.getUserStats );
  * @param body {object} Body to update document with
  * @returns Status code 200 if successful with updated document, 500 if error occurs
  */
-router.put( "/rescuers/:id", cordController.updateRescuers );
+router.put( "/rescuers/:id", auth.validateApp, cordController.updateRescuers );
 
 module.exports = router;

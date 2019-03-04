@@ -1,6 +1,5 @@
 const config         = require( "../config" ),
       routesTemplate = require( "./routes-template" ),
-      auth           = require( "../controllers/E-Auth" ),
       cords          = require( "./cords" );
 
 const routes = app => {
@@ -20,7 +19,7 @@ const routes = app => {
   } );
 
   // app.use( "/", routesTemplate );
-  app.use( "/cords", auth.validateApp, cords );
+  app.use( "/cords", cords );
 };
 
 module.exports = routes;
