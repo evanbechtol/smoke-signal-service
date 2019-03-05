@@ -19,7 +19,6 @@ mongoose.connect( config.dbUrl, {
   }
   logger.info( "Database connection successful" );
 
-
   let app = express();
 
 // Setup views and pathing
@@ -51,7 +50,7 @@ mongoose.connect( config.dbUrl, {
   io.on( "connection", function ( socket ) {
     logger.info( "a user connected" );
 
-    require( "./controllers/Socket")(io, socket);
+    require( "./controllers/Socket" )( io, socket );
 
     socket.on( "disconnect", function () {
       logger.info( "a user disconnected" );

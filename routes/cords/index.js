@@ -1,6 +1,9 @@
 const express        = require( "express" );
 const auth           = require( "../../controllers/E-Auth" );
 const cordController = require( "../../controllers/Cords" );
+const Multer         = require( "multer" );
+const uploadPath     = "uploads";
+const upload         = Multer( { dest : `${uploadPath}/` } );
 
 let router = express.Router();
 
@@ -22,6 +25,22 @@ router.get( "/", auth.validateApp, cordController.getCords );
  */
 router.post( "/", auth.validateApp, cordController.createCord );
 
+/**
+ * @method POST
+ * @description Upload a file for a cord
+ * @param body {object} Object used to create the document
+ * @returns Status code 200 if successful with created document, 500 if error occurs
+ */
+router.post( "/upload", auth.validateApp, upload.single('cordFile'), cordController.upload );
+
+
+/**
+ * @method GET
+ * @description Retrieve files for a cord
+ * @param id {string} Object ID of the Cord to retrieve files for
+ * @returns Status code 200 if successful with created document, 500 if error occurs
+ */
+router.get( "/files/:id", auth.validateApp, cordController.getFilesByCordId );
 /**
  * @method GET
  * @description Retrieve a cord by the provided object id

@@ -11,20 +11,24 @@ const schema = mongoose.Schema( {
     type    : String,
     default : ""
   },
+  files       : {
+    type    : String,
+    default : null
+  },
   discussion  : [
     {
       time : {
-        type: Date,
-        required: true,
-        default: Date.now()
+        type     : Date,
+        required : true,
+        default  : Date.now()
       },
       user : {
-        type: Object,
-        required: true
+        type     : Object,
+        required : true
       },
       data : {
-        type: String,
-        required: true
+        type     : String,
+        required : true
       }
     }
   ],
@@ -47,46 +51,46 @@ const schema = mongoose.Schema( {
   },
   rescuers    : [
     {
-      _id: {
-        type: String,
-        required: true
+      _id      : {
+        type     : String,
+        required : true
       },
-      username: {
-        type: String,
-        required: true
+      username : {
+        type     : String,
+        required : true
       }
     }
   ],
   puller      : {
-    _id: {
-      type: String,
-      required: true
+    _id      : {
+      type     : String,
+      required : true
     },
-    username: {
-      type: String,
-      required: true
-    },
+    username : {
+      type     : String,
+      required : true
+    }
   },
   title       : {
     type     : String,
     required : true,
     index    : true
   },
-  likes: {
-    type: Number,
-    default: 0
+  likes       : {
+    type    : Number,
+    default : 0
   },
-  tags: {
-    type: Array,
-    index: true,
-    default: []
+  tags        : {
+    type    : Array,
+    index   : true,
+    default : []
   }
 } );
 
 schema.index( { app : 1, category : 1 } );
 schema.index( { app : 1, category : 1, status : 1 } );
 schema.index( { category : 1, status : 1 } );
-schema.index( { puller: 1 } );
-schema.index( { puller: 1, status: 1 } );
+schema.index( { puller : 1 } );
+schema.index( { puller : 1, status : 1 } );
 
 module.exports = mongoose.model( "Cords", schema );

@@ -1,8 +1,16 @@
-const Cords             = require( "../../models/Cords" );
-const qUtil             = require( "../../util/queryUtil" );
-const resUtil           = require( "../../util/responseUtil" );
-const objectUtil        = require( "../../util" );
-const logger            = require( "../../config/logger" );
+const Cords          = require( "../../models/Cords" );
+const qUtil          = require( "../../util/queryUtil" );
+const resUtil        = require( "../../util/responseUtil" );
+const objectUtil     = require( "../../util" );
+const logger         = require( "../../config/logger" );
+const path           = require( "path" );
+const fs             = require( "fs" );
+const loki           = require( "lokijs" );
+const dbName         = "db.json";
+const collectionName = "files";
+const uploadPath     = "uploads";
+const db             = new loki( `${uploadPath}/${dbName}`, { persistenceMethod : "fs" } );
+
 const cordsKeyWhitelist = [
   "status",
   "description",
@@ -21,10 +29,12 @@ module.exports = {
   getCordById,
   getCordByStatus,
   getCordForUser,
+  getFilesByCordId,
   getUserStats,
   createCord,
   updateCord,
   updateRescuers,
+  upload,
   deleteCord
 };
 
@@ -194,6 +204,65 @@ function updateRescuers ( req, res ) {
         } );
   } else {
     return res.status( 400 ).send( resUtil.sendError( "Request ID or Body was not provided" ) );
+  }
+}
+
+async function upload ( req, res ) {
+  const _id = req.query.id || req.params.id || null;
+  if ( _id ) {
+    try {
+      const col  = await objectUtil.loadCollection( collectionName, db );
+      const data = col.insert( req.file );
+
+      db.saveDatabase();
+      if ( data && data.filename ) {
+        Cords.findByIdAndUpdate( _id, { "files" : data.filename }, { new : true } )
+            .then( response => {
+              return res.send( response );
+            } )
+            .catch( err => {
+              throw err;
+            } );
+      } else {
+        return res.status( 500 ).send( resUtil.sendError( "Error uploading file, please try again" ) );
+      }
+
+    } catch ( err ) {
+      return res.status( 400 ).send( resUtil.sendError( err ) );
+    }
+  } else {
+    return res.status( 400 ).send( resUtil.sendError( "Invalid request: ID is required" ) );
+  }
+}
+
+async function getFilesByCordId ( req, res ) {
+  const _id = req.query.id || req.params.id || null;
+  const col = await objectUtil.loadCollection( collectionName, db );
+
+  if ( _id ) {
+    try {
+      Cords.findById( _id, { files : 1 } )
+          .then( response => {
+            return response.files;
+          } )
+          .then( files => {
+            const result = col.findOne( { "filename" : files } );
+
+            if ( !result ) {
+              return res.sendStatus( 404 );
+            }
+
+            res.setHeader( "Content-Type", result.mimetype );
+            fs.createReadStream( path.join( uploadPath, result.filename ) ).pipe( res );
+          } )
+          .catch( err => {
+            throw err;
+          } );
+    } catch ( err ) {
+      return res.status( 400 ).send( resUtil.sendError( err ) );
+    }
+  } else {
+    return res.status( 400 ).send( resUtil.sendError( "Invalid request: ID is required" ) );
   }
 }
 
