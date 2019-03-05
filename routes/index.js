@@ -1,6 +1,7 @@
 const config         = require( "../config" ),
       routesTemplate = require( "./routes-template" ),
       cords          = require( "./cords" );
+uploads              = require( "./uploads" );
 
 const routes = app => {
   app.use( ( req, res, next ) => {
@@ -20,6 +21,7 @@ const routes = app => {
 
   // app.use( "/", routesTemplate );
   app.use( "/cords", cords );
+  app.use( "/uploads", uploads );
 };
 
 module.exports = routes;

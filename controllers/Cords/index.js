@@ -29,6 +29,7 @@ module.exports = {
   getCordById,
   getCordByStatus,
   getCordForUser,
+  getFile,
   getFilesByCordId,
   getUserStats,
   createCord,
@@ -60,6 +61,7 @@ function getCordById ( req, res ) {
   Cords
       .findById( _id )
       .then( results => {
+        //console.log(results);
         return res.send( resUtil.sendSuccess( results ) );
       } )
       .catch( err => {
@@ -252,12 +254,36 @@ async function getFilesByCordId ( req, res ) {
               return res.sendStatus( 404 );
             }
 
-            res.setHeader( "Content-Type", result.mimetype );
-            fs.createReadStream( path.join( uploadPath, result.filename ) ).pipe( res );
+            return res.send(resUtil.sendSuccess(result));
+            /*res.setHeader( "Content-Type", result.mimetype );
+            fs.createReadStream( path.join( uploadPath, result.filename ) ).pipe( res );*/
           } )
           .catch( err => {
             throw err;
           } );
+    } catch ( err ) {
+      return res.status( 400 ).send( resUtil.sendError( err ) );
+    }
+  } else {
+    return res.status( 400 ).send( resUtil.sendError( "Invalid request: ID is required" ) );
+  }
+}
+
+async function getFile ( req, res ) {
+  const fileName = req.query.id || req.params.id || null;
+  const col = await objectUtil.loadCollection( collectionName, db );
+
+  if ( fileName ) {
+    try {
+            const result = col.findOne( { "filename" : fileName } );
+
+            if ( !result ) {
+              return res.sendStatus( 404 );
+            }
+
+            //return res.send(resUtil.sendSuccess(result));
+            res.setHeader( "Content-Type", result.mimetype );
+             fs.createReadStream( path.join( uploadPath, result.filename ) ).pipe( res );
     } catch ( err ) {
       return res.status( 400 ).send( resUtil.sendError( err ) );
     }

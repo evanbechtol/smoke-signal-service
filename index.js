@@ -21,12 +21,8 @@ mongoose.connect( config.dbUrl, {
 
   let app = express();
 
-// Setup views and pathing
-  app.set( "view engine", config.viewEngine );
-  app.set( "views", path.join( __dirname, "public" ) );
-
 // Serve static content
-  app.use( express.static( path.join( __dirname, "public" ) ) );
+  app.use( express.static( path.join( __dirname, "uploads" ) ) );
 
 // Set up middleware
   app.use( morgan( "dev" ) );

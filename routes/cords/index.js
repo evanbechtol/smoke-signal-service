@@ -31,7 +31,7 @@ router.post( "/", auth.validateApp, cordController.createCord );
  * @param body {object} Object used to create the document
  * @returns Status code 200 if successful with created document, 500 if error occurs
  */
-router.post( "/upload", auth.validateApp, upload.single('cordFile'), cordController.upload );
+router.post( "/upload/:id", auth.validateApp, upload.single('cordFile'), cordController.upload );
 
 
 /**
