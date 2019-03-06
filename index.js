@@ -44,12 +44,12 @@ mongoose.connect( config.dbUrl, {
   const io = require( "socket.io" ).listen( server );
   io.origins( "*:*" );
   io.on( "connection", function ( socket ) {
-    logger.info( "a user connected" );
+    logger.info( `User with ID '${socket.id}' connected to namespace '${socket.nsp.name}'` );
 
     require( "./controllers/Socket" )( io, socket );
 
     socket.on( "disconnect", function () {
-      logger.info( "a user disconnected" );
+      logger.info( `User with ID '${socket.id}' disconnected from namespace '${socket.nsp.name}'` );
     } );
   } );
 } );
