@@ -45,11 +45,23 @@ mongoose.connect( config.dbUrl, {
   io.origins( "*:*" );
   io.on( "connection", function ( socket ) {
     logger.info( `User with ID '${socket.id}' connected to namespace '${socket.nsp.name}'` );
-
+    socket.nsp.emit("Hello user");
     require( "./controllers/Socket" )( io, socket );
 
     socket.on( "disconnect", function () {
       logger.info( `User with ID '${socket.id}' disconnected from namespace '${socket.nsp.name}'` );
+    } );
+  } );
+
+  const nsp = io.of('/smoke-signal-service/');
+
+  nsp.on( "connection", function ( socket ) {
+    logger.info( `User with ID '${socket.id}' connected to namespace /smoke-signal/` );
+    socket.nsp.emit("Hello user");
+    require( "./controllers/Socket" )( nsp, socket );
+
+    socket.on( "disconnect", function () {
+      logger.info( `User with ID '${socket.id}' disconnected from namespace /smoke-signal/` );
     } );
   } );
 } );
