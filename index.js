@@ -45,7 +45,7 @@ mongoose.connect( config.dbUrl, {
   io.origins( "*:*" );
   io.on( "connection", function ( socket ) {
     logger.info( `User with ID '${socket.id}' connected to namespace '${socket.nsp.name}'` );
-    socket.nsp.emit("Hello user");
+    socket.nsp.emit("Hello / user");
     require( "./controllers/Socket" )( io, socket );
 
     socket.on( "disconnect", function () {
@@ -53,9 +53,9 @@ mongoose.connect( config.dbUrl, {
     } );
   } );
 
-  io.of('/smoke-signal-service/socket.io').on( "connection", function ( socket ) {
+  io.of('/smoke-signal-service/').on( "connection", function ( socket ) {
     logger.info( `User with ID '${socket.id}' connected to namespace /smoke-signal/` );
-    socket.emit("SOCKET_NOTIFY", "Hello user");
+    socket.emit("SOCKET_NOTIFY", "Hello custom namespace user");
     require( "./controllers/Socket" )( io, socket );
 
     socket.on( "disconnect", function () {
