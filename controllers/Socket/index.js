@@ -23,7 +23,7 @@ module.exports = ( io, socket ) => {
     getCords( data )
         .then( response => {
           socket.emit( "SOCKET_REFRESH_GRID_ONE", response );
-          logger.info( `Grid refreshed for user: ${socket.id} in namespace ${JSON.stringify( socket.nsp )}` );
+          logger.info( `Grid refreshed for user: ${socket.id} in namespace ${socket.nsp}` );
         } )
         .catch( err => {
           logger.error( `Error refreshing grid: ${err}` );
@@ -48,7 +48,7 @@ module.exports = ( io, socket ) => {
         .then( results => {
           socket.emit( "SOCKET_REFRESH_ITEM", results );
           io.sockets.to( _id ).emit( "SOCKET_REFRESH_ITEM", results );
-          logger.info( `Item refreshed for users: ${socket.id} in namespace ${JSON.stringify( socket.nsp )}` );
+          logger.info( `Item refreshed for users: ${socket.id} in namespace ${socket.nsp}` );
 
           return getCords( { query : { status : "Open" } } );
         } )
