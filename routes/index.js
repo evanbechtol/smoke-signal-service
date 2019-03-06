@@ -1,7 +1,7 @@
 const config         = require( "../config" ),
       routesTemplate = require( "./routes-template" ),
-      cords          = require( "./cords" );
-uploads              = require( "./uploads" );
+      cords          = require( "./cords" ),
+      uploads        = require( "./uploads" );
 
 const routes = app => {
   app.use( ( req, res, next ) => {
