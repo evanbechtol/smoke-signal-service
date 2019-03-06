@@ -53,9 +53,7 @@ mongoose.connect( config.dbUrl, {
     } );
   } );
 
-  const nsp = io.of('/smoke-signal-service/');
-
-  nsp.on( "connection", function ( socket ) {
+  io.of('/smoke-signal-service').on( "connection", function ( socket ) {
     logger.info( `User with ID '${socket.id}' connected to namespace /smoke-signal/` );
     socket.nsp.emit("Hello user");
     require( "./controllers/Socket" )( nsp, socket );
