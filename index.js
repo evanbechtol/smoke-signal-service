@@ -53,10 +53,10 @@ mongoose.connect( config.dbUrl, {
     } );
   } );
 
-  io.of('/smoke-signal-service').on( "connection", function ( socket ) {
+  io.of('/smoke-signal-service/socket.io').on( "connection", function ( socket ) {
     logger.info( `User with ID '${socket.id}' connected to namespace /smoke-signal/` );
-    socket.nsp.emit("Hello user");
-    require( "./controllers/Socket" )( nsp, socket );
+    socket.emit("SOCKET_NOTIFY", "Hello user");
+    require( "./controllers/Socket" )( io, socket );
 
     socket.on( "disconnect", function () {
       logger.info( `User with ID '${socket.id}' disconnected from namespace /smoke-signal/` );
