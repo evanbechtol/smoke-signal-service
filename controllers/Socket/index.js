@@ -16,7 +16,7 @@ module.exports = ( io, socket ) => {
 
   socket.on( "NOTIFY", function ( body ) {
     io.emit( "SOCKET_NOTIFY", { message : body.message, data : body.data } );
-    logger.info( `Notification sent: ${body}` );
+    logger.info( `Notification sent: ${JSON.stringify( body )}` );
   } );
 
   socket.on( "REFRESH_GRID_ONE", function ( data = {} ) {
