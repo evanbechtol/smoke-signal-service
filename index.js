@@ -41,7 +41,7 @@ mongoose.connect( config.dbUrl, {
     logger.info( `Express running, now listening on port ${config.port}` );
   } );
 
-  const io = require( "socket.io" )( server, { path: "/smoke-signal-service"} );
+  const io = require( "socket.io" )( server, { path: "/smoke-signal-service/socket.io"} );
   io.origins( "*:*" );
   io.on( "connection", function ( socket ) {
     logger.info( `User ID '${socket.id}' connected to namespace '${socket.nsp.name}'` );
