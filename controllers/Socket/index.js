@@ -61,7 +61,11 @@ module.exports = ( io, socket ) => {
         } );
   } );
 
-  socket.on( "REFRESH_DISCUSSION", function ( socket ) {
+  socket.on( "SOCKET_ACK", function ( data ) {
+    socket.emit("SOCKET_FIN", "Hi there");
+  } );
+
+  socket.on( "SOCKET_REFRESH_DISCUSSION", function ( socket ) {
     logger.info( "Discussion Refresh called" );
   } );
 };

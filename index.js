@@ -41,25 +41,22 @@ mongoose.connect( config.dbUrl, {
     logger.info( `Express running, now listening on port ${config.port}` );
   } );
 
-  const io = require( "socket.io" ).listen( server );
+  const io = require( "socket.io" )( server, { path: "/smoke-signal-service"} );
   io.origins( "*:*" );
   io.on( "connection", function ( socket ) {
-    logger.info( `User with ID '${socket.id}' connected to namespace '${socket.nsp.name}'` );
-    socket.nsp.emit("Hello / user");
+    logger.info( `User ID '${socket.id}' connected to namespace '${socket.nsp.name}'` );
     require( "./controllers/Socket" )( io, socket );
-
     socket.on( "disconnect", function () {
       logger.info( `User with ID '${socket.id}' disconnected from namespace '${socket.nsp.name}'` );
     } );
   } );
 
-  io.of('/smoke-signal-service/').on( "connection", function ( socket ) {
+  io.of('/smoke-signal-service').on( "connection", function ( socket ) {
     logger.info( `User with ID '${socket.id}' connected to namespace /smoke-signal/` );
-    socket.emit("SOCKET_NOTIFY", "Hello custom namespace user");
     require( "./controllers/Socket" )( io, socket );
 
     socket.on( "disconnect", function () {
-      logger.info( `User with ID '${socket.id}' disconnected from namespace /smoke-signal/` );
+      logger.info( `User ID '${socket.id}' disconnected from namespace /smoke-signal/` );
     } );
   } );
 } );
