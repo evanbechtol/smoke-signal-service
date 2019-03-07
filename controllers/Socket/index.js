@@ -4,13 +4,13 @@ const qUtil  = require( "../../util/queryUtil" );
 
 module.exports = ( io, socket ) => {
   socket.on( "JOIN_ITEM_ROOM", function ( room ) {
-    logger.info( `User joined item room ${room}` );
+    logger.info( `User ID ${socket.id} joined item room ${room}` );
     socket.join( room );
   } );
 
   socket.on( "LEAVE_ITEM_ROOM", function ( room ) {
     socket.leave( room, () => {
-      logger.info( `User left item room ${room}` );
+      logger.info( `User ID ${socket.id} left item room ${room}` );
     } );
   } );
 
@@ -23,10 +23,10 @@ module.exports = ( io, socket ) => {
     getCords( data )
         .then( response => {
           socket.emit( "SOCKET_REFRESH_GRID_ONE", response );
-          logger.info( `Grid refreshed for user: ${socket.id} in namespace ${socket.nsp.name}` );
+          logger.info( `Grid refreshed for User ID ${socket.id} in namespace ${socket.nsp.name}` );
         } )
         .catch( err => {
-          logger.error( `Error refreshing grid: ${err}` );
+          logger.error( `Error refreshing grid for User ID ${socket.id} : ${err}` );
           socket.emit( "SOCKET_REFRESH_ERROR", err );
         } );
   } );
@@ -48,7 +48,7 @@ module.exports = ( io, socket ) => {
         .then( results => {
           socket.emit( "SOCKET_REFRESH_ITEM", results );
           io.sockets.to( _id ).emit( "SOCKET_REFRESH_ITEM", results );
-          logger.info( `Item refreshed for users: ${socket.id} in namespace ${socket.nsp.name}` );
+          logger.info( `Item ${_id} refreshed in namespace ${socket.nsp.name}` );
 
           return getCords( { query : { status : "Open" } } );
         } )
@@ -61,11 +61,7 @@ module.exports = ( io, socket ) => {
         } );
   } );
 
-  socket.on( "SOCKET_ACK", function ( data ) {
-    socket.emit("SOCKET_FIN", "Hi there");
-  } );
-
-  socket.on( "SOCKET_REFRESH_DISCUSSION", function ( socket ) {
+  socket.on( "SOCKET_REFRESH_DISCUSSION", function (  ) {
     logger.info( "Discussion Refresh called" );
   } );
 };
