@@ -1,6 +1,4 @@
-const config         = require( "../config" ),
-      routesTemplate = require( "./routes-template" ),
-      cords          = require( "./cords" ),
+const cords          = require( "./cords" ),
       uploads        = require( "./uploads" );
 
 const routes = app => {
@@ -19,7 +17,6 @@ const routes = app => {
     next();
   } );
 
-  // app.use( "/", routesTemplate );
   app.use( "/cords", cords );
   app.use( "/uploads", uploads );
 };

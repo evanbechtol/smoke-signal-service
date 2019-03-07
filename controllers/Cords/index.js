@@ -255,8 +255,6 @@ async function getFilesByCordId ( req, res ) {
             }
 
             return res.send(resUtil.sendSuccess(result));
-            /*res.setHeader( "Content-Type", result.mimetype );
-            fs.createReadStream( path.join( uploadPath, result.filename ) ).pipe( res );*/
           } )
           .catch( err => {
             throw err;
@@ -281,7 +279,6 @@ async function getFile ( req, res ) {
               return res.sendStatus( 404 );
             }
 
-            //return res.send(resUtil.sendSuccess(result));
             res.setHeader( "Content-Type", result.mimetype );
              fs.createReadStream( path.join( uploadPath, result.filename ) ).pipe( res );
     } catch ( err ) {
