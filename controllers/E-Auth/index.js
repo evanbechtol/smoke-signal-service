@@ -16,7 +16,7 @@ function validateApp ( req, res, next ) {
       const data = JSON.parse( body );
       //debugger;
       if ( data.success === false ) {
-        return res.status( 400 ).send( resUtil.sendError( data.data.message ) );
+        return res.status( 400 ).send( resUtil.sendError( data && data.data ? data.data.message : JSON.stringify( data ) ) );
       }
       next();
     } );
