@@ -1,22 +1,20 @@
 {
-  "name": "bare-express-server",
+  "name": "smoke-signal-service",
+  "author": "Evan Bechtol <evan.bechtol@ericsson.com>",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "set NODE_ENV=development && node index.js",
     "start": "node index.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Parasin/bare-express.git"
+    "url": "git+https://scmgr.eams.ericsson.net/incubation/smoke-signal-service.git"
   },
-  "author": "Evan Bechtol",
-  "license": "GPL-3.0",
   "bugs": {
-    "url": "https://github.com/Parasin/bare-express/issues"
+    "url": "https://scmgr.eams.ericsson.net/incubation/smoke-signal-service/issues"
   },
-  "homepage": "https://github.com/Parasin/bare-express#readme",
+  "homepage": "https://scmgr.eams.ericsson.net/incubation/smoke-signal-service#readme",
   "dependencies": {
     "body-parser": "^1.18.2",
     "compression": "^1.7.1",
