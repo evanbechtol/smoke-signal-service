@@ -9,24 +9,18 @@ Issue Pull Requests or open issues for any changes that you make.
 * Compression of responses
 * Configurable application variables
 * REST-ful API setup
-* MongoDB support 
-     * Branch: [mongoose](https://github.com/Parasin/bare-express/tree/mongoose) 
-     * Connect and interact with Mongo DB's through [Mongoose](http://mongoosejs.com/)
+* MongoDB support
 
-### Future Functionality
-All future functionality will branch off of master; the master branch will always be
-a simple "scaffold" express server. The other branches will contain additional functionality.
-
-* SQL DB support: Connect and interact with SQL DB's through [Sequelize](http://docs.sequelizejs.com/)
-* Passport: Implement authentication and authorization strategies with [Passport](http://passportjs.org/) 
+### Pre-requisites
+* [Node.js](https://nodejs.org)
+* [MongoDB](https://www.mongodb.com/)
 
 ### Setup
+Assumes that pre-requisites are met.
 - Simply clone the repo
 ```git clone https://scmgr.eams.ericsson.net/incubation/smoke-singal-service.git```
 
 - Install the dependencies 
-   - Install [Node.JS](https://nodejs.org/en/)
-   - Install [MongoDB](https://www.mongodb.com/)
    - Install application dependencies ```npm install```
 
 - Add the routes you need under the `routes` directory, and include require them in your `routes/index.js` file.
@@ -41,21 +35,9 @@ a simple "scaffold" express server. The other branches will contain additional f
      |---> index.js
 ```
 
-```
-//FILE: routes/index.js
-const user = require( './user' );
-
-// WON'T ENFORCE HTTPS
-  if ( config.env === 'development' ) {
-     app.use( '/user', user );
-  }
-
-  // WILL ENFORCE HTTPS
-  else {
-     app.use( '/user', user );
-  }
-```
-
 ### Starting 
 * Run the command ```npm test``` to run the application in "development" mode.
 * Run the command ```npm start``` to run the application in "production" mode.
+
+### Questions & Concerns
+Please contact Evan Bechtol <evan.bechtol@ericsson.com>
