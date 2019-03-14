@@ -13,8 +13,18 @@ function validateApp ( req, res, next ) {
 
   if ( token ) {
     request.get( url, options, function ( err, response, body ) {
-      const data = JSON.parse( body );
-      //debugger;
+      let data;
+
+      if ( typeof body === "object" ) {
+        data = body;
+      } else {
+        try {
+          data = JSON.parse( body );
+        } catch ( e ) {
+          logger.error( JSON.stringify( e ) );
+        }
+      }
+
       if ( data.success === false ) {
         return res.status( 400 ).send( resUtil.sendError( data && data.data ? data.data.message : JSON.stringify( data ) ) );
       }
