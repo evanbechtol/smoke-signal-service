@@ -9,7 +9,7 @@ const bodyParser  = require( "body-parser" ),
       logger      = require( "./config/logger" );
 
 // This is dangerous a.f., but has to be done for prod
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+//process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 //require('ssl-root-cas/latest').inject();
 
 mongoose.Promise = global.Promise;
