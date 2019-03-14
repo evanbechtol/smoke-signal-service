@@ -8,6 +8,9 @@ const bodyParser  = require( "body-parser" ),
       mongoose    = require( "mongoose" ),
       logger      = require( "./config/logger" );
 
+// This is dangerous a.f., but has to be done for prod
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
 mongoose.Promise = global.Promise;
 mongoose.connect( config.dbUrl, {
   useCreateIndex  : true,
