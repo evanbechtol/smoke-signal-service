@@ -13,6 +13,10 @@ function validateApp ( req, res, next ) {
 
   if ( token ) {
     request.get( url, options, function ( err, response, body ) {
+      if (err) {
+       return res.status( 500 ).send( resUtil.sendError( err ) );
+      }
+
       let data;
 
       if ( typeof body === "object" ) {
@@ -27,9 +31,8 @@ function validateApp ( req, res, next ) {
 
       if ( data && data.success === false ) {
         return res.status( 400 ).send( resUtil.sendError( data && data.data ? data.data.message : JSON.stringify( data ) ) );
-      } else {
-        return res.status( 500 ).send( resUtil.sendError( data ) );
       }
+
       next();
     } );
   } else {
