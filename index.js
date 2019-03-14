@@ -10,7 +10,7 @@ const bodyParser  = require( "body-parser" ),
 
 // This is dangerous a.f., but has to be done for prod
 //process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-//require('ssl-root-cas/latest').inject();
+require('ssl-root-cas/latest').inject();
 
 mongoose.Promise = global.Promise;
 mongoose.connect( config.dbUrl, {
