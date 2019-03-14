@@ -25,8 +25,10 @@ function validateApp ( req, res, next ) {
         }
       }
 
-      if ( data.success === false ) {
+      if ( data && data.success === false ) {
         return res.status( 400 ).send( resUtil.sendError( data && data.data ? data.data.message : JSON.stringify( data ) ) );
+      } else {
+        return res.status( 500 ).send( resUtil.sendError( data ) );
       }
       next();
     } );
