@@ -1,5 +1,6 @@
 const cords          = require( "./cords" ),
-      uploads        = require( "./uploads" );
+      uploads        = require( "./uploads" ),
+      notifications        = require( "./notifications" );
 
 const routes = app => {
   app.use( ( req, res, next ) => {
@@ -19,6 +20,7 @@ const routes = app => {
 
   app.use( "/cords", cords );
   app.use( "/uploads", uploads );
+  app.use( "/notifications", notifications );
 };
 
 module.exports = routes;
