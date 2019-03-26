@@ -14,10 +14,8 @@ function getDbQueryStrings ( queryString = {}) {
   if ( query && typeof query === "string" ) {
       try {
         query = JSON.parse( query );
-        console.log( query );
       } catch ( e ) {
         logger.error( { error: e, query } );
-        console.log( query );
       }
   }
 
