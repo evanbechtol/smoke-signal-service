@@ -1,4 +1,5 @@
 const Cords          = require( "../../models/Cords" );
+const CategoryList   = require("../../models/CategoryList/index.js");
 const qUtil          = require( "../../util/queryUtil" );
 const resUtil        = require( "../../util/responseUtil" );
 const objectUtil     = require( "../../util" );
@@ -36,7 +37,8 @@ module.exports = {
   updateCord,
   updateRescuers,
   upload,
-  deleteCord
+  deleteCord,
+  getCategoryList
 };
 
 function getCords ( req, res ) {
@@ -54,6 +56,18 @@ function getCords ( req, res ) {
 
         return res.send( resUtil.sendSuccess( results ) );
       } );
+}
+
+function getCategoryList (req, res ){
+    CategoryList.find({})
+    .then( results => {
+      console.log('Hello from the other side', results);
+      return res.send( resUtil.sendSuccess( results ) );
+    })
+    .catch( err => {
+      console.log('Nooooo this is errorr', err);
+      return res.status( 400 ).send( resUtil.sendError( err ) );
+    });
 }
 
 function getCordById ( req, res ) {
