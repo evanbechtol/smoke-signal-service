@@ -2,22 +2,12 @@ const mongoose = require( "mongoose" );
 
 const schema = mongoose.Schema( {
   
-  notify_receiver : {
+  notifyReceiver : {
     _id      : {
       type     : String,
       required : true
     },
-    username : {
-      type     : String,
-      required : true
-    }
-  },
-  puller      : {
-    _id      : {
-      type     : String,
-      required : true
-    },
-    username : {
+    userName : {
       type     : String,
       required : true
     }
@@ -43,16 +33,35 @@ const schema = mongoose.Schema( {
     required : true,
     index    : true
   },
-  read_timestamp  : {
+  readTimeStamp  : {
     type : Date,
 	default : null
   },
-  created_timestamp  : {
+  createdTimeStamp  : {
     type : Date,
 	default  : Date.now()
-  } 
+  },
+  cord : {
+    _id      : {
+      type     : String,
+      required : true
+    }
+  },
+  createdBy : {
+    _id      : {
+      type     : String,
+      required : true
+    },
+    userName : {
+      type     : String,
+      required : true
+    }
+  }  
    
 } );
 
-schema.index( { notify_receiver : 1, read_timestamp : 1 } );
+schema.index( { notifyReceiver : 1, readTimeStamp : 1 } );
+schema.index( { notifyReceiver : 1 } );
+schema.index( { readTimeStamp : 1 } );
+schema.index( { status : 1 } );
 module.exports = mongoose.model( "tool_notifications", schema );
