@@ -10,6 +10,8 @@ const dbName         = "db.json";
 const collectionName = "files";
 const uploadPath     = "uploads";
 const db             = new loki( `${uploadPath}/${dbName}`, { persistenceMethod : "fs" } );
+const config         = require( "../../config" );
+const slack          = require('slack-notify')(`${config.slackWebhookUrl}`);
 
 const cordsKeyWhitelist = [
   "status",
@@ -61,7 +63,6 @@ function getCordById ( req, res ) {
   Cords
       .findById( _id )
       .then( results => {
-        //console.log(results);
         return res.send( resUtil.sendSuccess( results ) );
       } )
       .catch( err => {
@@ -151,7 +152,7 @@ function createCord ( req, res ) {
           if ( err ) {
             return res.status( 500 ).send( resUtil.sendError( err ) );
           }
-
+          sendSlackNotifications(req, true);
           return res.send( resUtil.sendSuccess( results ) );
         } );
   } else {
@@ -180,7 +181,7 @@ function updateCord ( req, res ) {
           if ( err ) {
             return res.status( 500 ).send( resUtil.sendError( err ) );
           }
-
+          sendSlackNotifications(req, false);
           return res.send( resUtil.sendSuccess( results ) );
         } );
   } else {
@@ -304,5 +305,31 @@ function deleteCord ( req, res ) {
         } );
   } else {
     return res.status( 400 ).send( resUtil.sendError( "Request ID was not provided" ) );
+  }
+}
+
+/* send slack notifications on cord creation and modification */
+function sendSlackNotifications(req, create) {
+  try {
+      let body, action;
+      action  = (create) ? 'New cord '+ req.body.title +' has been created' : req.body.title +' cord has been modified';
+      body    = action + " by " + req.body.puller.username +" in " + req.body.app + " application with following details,"+
+                "\n 1. Title : " + req.body.title + "\n2. Description : " + req.body.description + "\n3. Category : " + req.body.category + "" + 
+                "\nFor more details logon to smoke signal app, " + req.header('Referer') + " and be a Hero !";
+
+      slack.send({
+              channel       : `${config.slackChannel}`,
+              icon_url      : `${config.iconUrl}`,
+              text          : body,
+              unfurl_links  : 1,
+              username      : `${config.slackUsername}`
+      });
+
+      slack.onError = function (err) {
+        throw err;
+      };
+
+  } catch ( err ) {    
+      logger.error( `Error sending slack notification: ${err}` );
   }
 }
