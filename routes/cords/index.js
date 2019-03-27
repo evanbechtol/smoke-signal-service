@@ -18,6 +18,14 @@ let router = express.Router();
 router.get( "/get", auth.validateApp, cordController.getCords );
 
 /**
+ * @method GET
+ * @description Retrieve apps
+ * @param query {string} Optionally pass in to control the query performed by MonogDB
+ * @returns Status code 200 and data if query successful. 500 if an error occurs
+ */
+router.get( "/getapps", auth.validateApp, cordController.getApps );
+
+/**
  * @method POST
  * @description Create a cord, provided that all required keys are provided
  * @param body {object} Object used to create the document
@@ -98,5 +106,8 @@ router.get( "/stats/:user", auth.validateApp, cordController.getUserStats );
  * @returns Status code 200 if successful with updated document, 500 if error occurs
  */
 router.put( "/rescuers/:id", auth.validateApp, cordController.updateRescuers );
+
+
+
 
 module.exports = router;
