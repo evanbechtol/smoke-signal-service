@@ -13,12 +13,11 @@ function getToolNotificationUnreadList(req, res) {
 	//to get unread count
 	var notificationCount = 0;
 	toolNotification.count(queryStrings.query, function(err, count) {
-        if (!err) {
-            notificationCount = count;
-        } else {
-
-            return res.send(err);
+        if (err) {
+			return res.send( resUtil.sendError( err ) );
+           
         }
+		notificationCount = count;
     });
 	
 	//to get list of unread notification
@@ -43,13 +42,11 @@ function updateNotification(req, res) {
 		const updatedData = { $set: { readTimeStamp: new Date() } };
 		
 		toolNotification.findByIdAndUpdate(_id, updatedData, function(err, result) {
-			if (!err) { 
-				 req.query =  req.body; 
-				 getToolNotificationUnreadList(req, res);
-			} else {
-
-				return res.send(err); // 500 error
-			}
+			if (err) { 
+				 return res.send( resUtil.sendError( err ) ) // 500 error				 
+			} 
+			req.query =  req.body; 
+			getToolNotificationUnreadList(req, res);
 		});
 	}
 }
