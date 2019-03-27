@@ -9,17 +9,7 @@ module.exports = {
 
 function getToolNotificationUnreadList(req, res) {
 	const queryStrings = qUtil.getDbQueryStrings( req.query );
-
-	//to get unread count
-	var notificationCount = 0;
-	toolNotification.count(queryStrings.query, function(err, count) {
-        if (err) {
-			return res.send( resUtil.sendError( err ) );
-           
-        }
-		notificationCount = count;
-    });
-	
+ 	
 	//to get list of unread notification
 	toolNotification
       .find(queryStrings.query)
@@ -29,8 +19,7 @@ function getToolNotificationUnreadList(req, res) {
         if ( err ) {
           return res.status( 500 ).send( resUtil.sendError( err ) );
         }
-		const response = { 'notificationCount': notificationCount, 'notificationList':results };
-        return res.send( resUtil.sendSuccess( response ) );
+        return res.send( resUtil.sendSuccess( results ) );
       } );
 }
 

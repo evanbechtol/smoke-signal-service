@@ -17,21 +17,27 @@ const schema = mongoose.Schema( {
     required : true,
     index    : true
   },
-  app         : {
-    type     : String,
-    required : true,
-    index    : true
-  },
-  status      : {
-    type     : String,
-    required : true,
-    index    : true,
-    default  : "Open"
-  },
-  title       : {
-    type     : String,
-    required : true,
-    index    : true
+  cord : {
+	_id      : {
+	  type     : String,
+	  required : true
+	},
+	title       : {
+		type     : String,
+		required : true,
+		index    : true
+	  },
+	status      : {
+		type     : String,
+		required : true,
+		index    : true,
+		default  : "Open"
+	},
+	app         : {
+		type     : String,
+		required : true,
+		index    : true
+	}
   },
   readTimeStamp  : {
     type : Date,
@@ -40,12 +46,6 @@ const schema = mongoose.Schema( {
   createdTimeStamp  : {
     type : Date,
 	default  : Date.now()
-  },
-  cord : {
-    _id      : {
-      type     : String,
-      required : true
-    }
   },
   createdBy : {
     _id      : {
