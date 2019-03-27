@@ -45,7 +45,7 @@ module.exports = {
 function getCords(req, res) {
   const queryStrings = qUtil.getDbQueryStrings(req.query);
 
-  apps
+  Cords
     .find(queryStrings.query)
     .select({ __v: 0, description: 0 })
     .sort(queryStrings.sort)
