@@ -195,11 +195,13 @@ function updateCord(req, res) {
     Cords
       .findByIdAndUpdate(_id, body, { new: true })
       .exec(function (err, results) {
+        console.log("result >>>>",results);
         if (err) {
           return res.status(500).send(resUtil.sendError(err));
         }
+        notificationController.userDiscussion(results);
 
-        return res.send(resUtil.sendSuccess(results));
+        //return res.send(resUtil.sendSuccess(results));
       });
   } else {
     return res.status(400).send(resUtil.sendError("Request ID or Body was not provided"));
