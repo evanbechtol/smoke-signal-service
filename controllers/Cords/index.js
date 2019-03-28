@@ -12,6 +12,7 @@ const uploadPath = "uploads";
 const db = new loki(`${uploadPath}/${dbName}`, { persistenceMethod: "fs" });
 const apps = require("../../models/Apps");
 const notificationController = require("../../controllers/Notifications");
+const userApps = require("../../models/userApps");
 
 const cordsKeyWhitelist = [
   "status",
@@ -154,12 +155,22 @@ function createCord(req, res) {
         if (err) {
           return res.status(500).send(resUtil.sendError(err));
         }
-        notificationController.createNotification(results, req, res)
+		
+		userApps
+		.find({ apps: results.app })
+		.select({ __v: 0, description: 0 })
+		.exec(function (err, resp) {
+			if (err) {
+				return err;
+			}
+		    notificationController.createNotification(results, resp)
           .then(resp => {
             return res.send(resUtil.sendSuccess(resp));
           }).catch(err => {
             return res.send(err);
           })
+		})
+		
       });
   } else {
     return res.status(400).send(resUtil.sendError("Request body not provided"));

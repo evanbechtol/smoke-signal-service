@@ -1,5 +1,4 @@
 const toolNotification = require("../../models/toolNotification");
-const userApps = require("../../models/userApps");
 const qUtil = require("../../util/queryUtil");
 const resUtil = require("../../util/responseUtil");
 
@@ -42,15 +41,7 @@ function updateNotification(req, res) {
 	}
 }
 
-async function createNotification(result, req, res) {
-	const queryStrings = { apps: result.app }
-	userApps
-		.find(queryStrings)
-		.select({ __v: 0, description: 0 })
-		.exec(function (err, resp) {
-			if (err) {
-				return err;
-			}
+async function createNotification(result, resp) {
 			resp.forEach(function (data) {
 				const inputData = {
 					notifyReceiver: data.user,
@@ -69,9 +60,7 @@ async function createNotification(result, req, res) {
 						return results;
 					});
 			});
-
-		});
-
+ 
 }
 
 
