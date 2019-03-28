@@ -9,8 +9,9 @@ const loki = require("lokijs");
 const dbName = "db.json";
 const collectionName = "files";
 const uploadPath = "uploads";
-const notificationController = require("../../controllers/Notifications");
 const db = new loki(`${uploadPath}/${dbName}`, { persistenceMethod: "fs" });
+const apps = require("../../models/Apps");
+const notificationController = require("../../controllers/Notifications");
 
 const cordsKeyWhitelist = [
   "status",
@@ -27,6 +28,7 @@ const cordsKeyWhitelist = [
 
 module.exports = {
   getCords,
+  getApps,
   getCordById,
   getCordByStatus,
   getCordForUser,
@@ -37,7 +39,8 @@ module.exports = {
   updateCord,
   updateRescuers,
   upload,
-  deleteCord,
+  deleteCord
+
 };
 
 function getCords(req, res) {
@@ -311,4 +314,14 @@ function deleteCord(req, res) {
   }
 }
 
-
+function getApps(req, res) {
+  const queryStrings = qUtil.getDbQueryStrings(req.query);
+  apps
+    .find(queryStrings.query)
+    .exec(function (err, results) {
+      if (err) {
+        return res.status(500).send(resUtil.sendError(err));
+      }
+      return res.send(resUtil.sendSuccess(results));
+    });
+}
