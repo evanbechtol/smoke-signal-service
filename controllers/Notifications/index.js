@@ -56,7 +56,7 @@ async function createNotification(result, req, res) {
 					notifyReceiver: data.user,
 					readTimeStamp: null,
 					createdTimeStamp: new Date().toISOString(),
-					cord: { _id: result._id, status: result.status, app: result.app, title: result.status },
+					cord: { _id: result._id, status: result.status, app: result.app, title: result.title },
 					subject: "New Cord has been created",
 					createdBy: result.puller
 				}
