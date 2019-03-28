@@ -29,7 +29,24 @@ const schema = mongoose.Schema( {
       data : {
         type     : String,
         required : true
-      }
+      },
+      comments  : [
+        {
+          time : {
+            type     : Date,
+            required : true,
+            default  : Date.now()
+          },
+          user : {
+            type     : Object,
+            required : true
+          },
+          data : {
+            type     : String,
+            required : true
+          }
+        }
+      ]
     }
   ],
   app         : {
