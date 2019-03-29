@@ -1,5 +1,5 @@
 const Cords          = require( "../../models/Cords" );
-const CategoryList   = require("../../models/CategoryList/index.js");
+const CategoryList   = require( "../../models/CategoryList/index.js" );
 const qUtil          = require( "../../util/queryUtil" );
 const resUtil        = require( "../../util/responseUtil" );
 const objectUtil     = require( "../../util" );
@@ -59,13 +59,14 @@ function getCords ( req, res ) {
 }
 
 function getCategoryList ( req, res ) {
-  CategoryList.find( { } )
+  CategoryList
+    .find( { } )
     .then(results => {
-      return res.send(resUtil.sendSuccess(results));
-    })
+      return res.send( resUtil.sendSuccess( results ) );
+    } )
     .catch(err => {
-      return res.status(500).send(resUtil.sendError(err));
-    });
+      return res.status( 500 ).send( resUtil.sendError( err ) );
+    } );
 }
 
 function getCordById ( req, res ) {
