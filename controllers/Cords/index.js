@@ -12,7 +12,7 @@ const uploadPath     = "uploads";
 const db             = new loki( `${uploadPath}/${dbName}`, { persistenceMethod : "fs" } );
 const config         = require( "../../config" );
 const slack          = require('slack-notify')(`${config.slackWebhookUrl}`);
-const slackNotificationUtil  = require( "../../util/templates/slackNotificationUtil" );
+const slackNotificationUtil  = require( "../../util/slackUtil" );
 
 const cordsKeyWhitelist = [
   "status",
