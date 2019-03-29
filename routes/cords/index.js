@@ -99,13 +99,11 @@ router.get( "/stats/:user", auth.validateApp, cordController.getUserStats );
  */
 router.put( "/rescuers/:id", auth.validateApp, cordController.updateRescuers );
 
-//Fetching the type of category, while pulling a cord
 /**
  * @method GET
- * @description Retrieve a cord by the provided object id
- * @param id {string} Object ID of the Cord to retrieve
+ * @description Retrieve all categories
  * @returns Status code 200 if successful with retrieved document, 500 if error occurs
  */
-router.get("/category/list", auth.validateApp, cordController.getCategoryList );
+router.get( "/category/list", auth.validateApp, cordController.getCategoryList );
 
 module.exports = router;

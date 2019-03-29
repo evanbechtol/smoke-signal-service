@@ -58,15 +58,13 @@ function getCords ( req, res ) {
       } );
 }
 
-function getCategoryList (req, res ){
-    CategoryList.find({})
-    .then( results => {
-      console.log('Hello from the other side', results);
-      return res.send( resUtil.sendSuccess( results ) );
+function getCategoryList ( req, res ) {
+  CategoryList.find( { } )
+    .then(results => {
+      return res.send(resUtil.sendSuccess(results));
     })
-    .catch( err => {
-      console.log('Nooooo this is errorr', err);
-      return res.status( 400 ).send( resUtil.sendError( err ) );
+    .catch(err => {
+      return res.status(500).send(resUtil.sendError(err));
     });
 }
 
