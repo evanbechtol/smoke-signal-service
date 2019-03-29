@@ -162,7 +162,9 @@ function createCord(req, res) {
 		.exec(function (err, resp) {
 			if (err) {
 				return err;
-			}
+      }
+        results.subject="New Cord has been created";
+        console.log("result of subject",results);
 		    notificationController.createNotification(results, resp)
           .then(resp => {
             return res.send(resUtil.sendSuccess(resp));
@@ -195,13 +197,16 @@ function updateCord(req, res) {
     Cords
       .findByIdAndUpdate(_id, body, { new: true })
       .exec(function (err, results) {
-        console.log("result >>>>",results);
         if (err) {
           return res.status(500).send(resUtil.sendError(err));
         }
-        notificationController.userDiscussion(results);
+        notificationController.userDiscussion(results).
+        then(resp=>{
+          return res.send(resUtil.sendSuccess(resp));
+        }).catch(err => {
+          throw err;
+        });
 
-        //return res.send(resUtil.sendSuccess(results));
       });
   } else {
     return res.status(400).send(resUtil.sendError("Request ID or Body was not provided"));

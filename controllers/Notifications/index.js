@@ -49,13 +49,12 @@ async function createNotification(result, resp) {
 			readTimeStamp: null,
 			createdTimeStamp: new Date().toISOString(),
 			cord: { _id: result._id, status: result.status, app: result.app, title: result.title },
-			subject: "New Cord has been created",
+			subject: result.subject,
 			createdBy: result.puller
 		}
 		toolNotification
 			.create(inputData, function (err, results) {
 				if (err) {
-					console.log("error", err);
 					throw err;
 				}
 				return results;
@@ -64,19 +63,17 @@ async function createNotification(result, resp) {
 
 }
 
-function userDiscussion(data) {
+async function userDiscussion(data) {
+	
 	let lookup = {};
 	let result = [];
-	if (data.discussion.length != 1) {
-		for (let item, i = 0; item = data.discussion[i++];) {
-			let id = item.user._id;
-			if (!(id in lookup)) {
-				lookup[id] = 1;
-				if (data.puller._id != data.discussion[data.discussion.length - 1].user._id) {
-					result.push({ user: { _id: item.user._id, username: item.user.username } });
-				}
-
-			}
+	if(data.status=="Open"){
+	let creater = data.discussion[data.discussion.length - 1].user;
+	for (let item, i = 0; item = data.discussion[i++];) {
+		let id = item.user._id;
+		if ((!(id in lookup)) && (id != data.discussion[data.discussion.length - 1].user._id)) {
+			lookup[id] = 1;
+			result.push({ user: { _id: item.user._id, username: item.user.username } });
 		}
 	}
 
@@ -85,7 +82,26 @@ function userDiscussion(data) {
 			result.push({ user: { _id: data.puller._id, username: data.puller.username } });
 		}
 	}
-	createNotification(data, result);
+
+	if (result.length > 0) {
+		data.puller={_id:creater._id,username:creater.username};
+		data.subject="Cord has been updated";
+		return createNotification(data, result);
+	}
+}else{
+	for (let item, i = 0; item = data.discussion[i++];) {
+		let id = item.user._id;
+		if ((!(id in lookup)) && (id != data.puller._id)) {
+			lookup[id] = 1;
+			result.push({ user: { _id: item.user._id, username: item.user.username } });
+		}
+	}
+	if (result.length > 0) {
+		data.subject="Cord has been resolved";
+		return createNotification(data, result);
+	}
+}
+
 }
 
 
