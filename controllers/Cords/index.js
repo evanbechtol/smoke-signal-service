@@ -11,7 +11,7 @@ const collectionName = "files";
 const uploadPath     = "uploads";
 const db             = new loki( `${uploadPath}/${dbName}`, { persistenceMethod : "fs" } );
 const config         = require( "../../config" );
-const slack          = require('slack-notify')(`${config.slackWebhookUrl}`);
+const slack          = (config.slackWebhookUrl !== undefined) ? require('slack-notify')(`${config.slackWebhookUrl}`) : false;
 const slackNotificationUtil  = require( "../../util/slackUtil" );
 
 const cordsKeyWhitelist = [
@@ -311,6 +311,10 @@ function deleteCord ( req, res ) {
 
 /* send slack notifications on cord creation and modification */
 function sendSlackNotifications(req, create) {
+  if(!slack){
+      logger.error( 'The parameter slackWebhookUrl is not defined, unable to send slack notification' );
+      return false;
+  }
   try {
     let body, data;
 

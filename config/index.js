@@ -5,7 +5,7 @@ const config = {
   env        		: process.env.NODE_ENV || 'development',
   logDir     		: process.env.LOGDIR || 'logs',
   viewEngine 		: process.env.VIEW_ENGINE || 'html',
-  slackWebhookUrl 	: process.env.SLACK_WEBHOOK_URL || 'https://hooks.slack.com/services/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',
+  slackWebhookUrl 	: process.env.SLACK_WEBHOOK_URL,
   slackChannel 		: process.env.SLACK_CHANNEL || '#test_smoke_signal',
   iconUrl 			: process.env.ICON_URL || 'https://uat.eams.ericsson.net/eams/web/img/logo.png',
   slackUsername		: process.env.SLACK_USERNAME || 'Smoke Signal'
