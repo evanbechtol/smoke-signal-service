@@ -21,7 +21,6 @@ mongoose.connect( config.dbUrl, {
   if ( err ) {
     throw err;
   }
-  console.log( "Database connection successful" );
   logger.info( "Database connection successful" );
 
   let app = express();
@@ -43,7 +42,6 @@ mongoose.connect( config.dbUrl, {
 
   // Start application
   const server = app.listen( config.port, () => {
-    console.log( `Express running, now listening on port ${config.port}` );
     logger.info( `Express running, now listening on port ${config.port}` );
   } );
 

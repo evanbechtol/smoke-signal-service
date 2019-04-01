@@ -11,7 +11,7 @@ const collectionName = "files";
 const uploadPath     = "uploads";
 const db             = new loki( `${uploadPath}/${dbName}`, { persistenceMethod : "fs" } );
 const config         = require( "../../config" );
-const slack          = (config.slackWebhookUrl !== undefined) ? require('slack-notify')(`${config.slackWebhookUrl}`) : false;
+const slack          = (config.slackWebhookUrl !== undefined) ? require("slack-notify")(`${config.slackWebhookUrl}`) : false;
 const slackNotificationUtil  = require( "../../util/slackUtil" );
 
 const cordsKeyWhitelist = [
