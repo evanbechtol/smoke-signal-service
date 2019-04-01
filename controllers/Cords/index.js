@@ -10,9 +10,6 @@ const dbName         = "db.json";
 const collectionName = "files";
 const uploadPath     = "uploads";
 const db             = new loki( `${uploadPath}/${dbName}`, { persistenceMethod : "fs" } );
-const config         = require( "../../config" );
-const slack          = require('slack-notify')(`${config.slackWebhookUrl}`);
-const slackNotificationUtil  = require( "../../util/slackUtil" );
 
 const cordsKeyWhitelist = [
   "status",
@@ -64,6 +61,7 @@ function getCordById ( req, res ) {
   Cords
       .findById( _id )
       .then( results => {
+        //console.log(results);
         return res.send( resUtil.sendSuccess( results ) );
       } )
       .catch( err => {
@@ -153,7 +151,7 @@ function createCord ( req, res ) {
           if ( err ) {
             return res.status( 500 ).send( resUtil.sendError( err ) );
           }
-          sendSlackNotifications(req, true);
+
           return res.send( resUtil.sendSuccess( results ) );
         } );
   } else {
@@ -182,7 +180,7 @@ function updateCord ( req, res ) {
           if ( err ) {
             return res.status( 500 ).send( resUtil.sendError( err ) );
           }
-          sendSlackNotifications(req, false);
+
           return res.send( resUtil.sendSuccess( results ) );
         } );
   } else {
@@ -306,32 +304,5 @@ function deleteCord ( req, res ) {
         } );
   } else {
     return res.status( 400 ).send( resUtil.sendError( "Request ID was not provided" ) );
-  }
-}
-
-/* send slack notifications on cord creation and modification */
-function sendSlackNotifications(req, create) {
-  try {
-    let body, data;
-
-    data = {  "action": create, "title": req.body.title, "username": req.body.puller.username, "app": req.body.app,
-              "description": req.body.description, "category": req.body.category, "url": req.header('Referer')  };
-
-    body =  slackNotificationUtil.getTemplate(data);
-
-    slack.send({
-              channel       : `${config.slackChannel}`,
-              icon_url      : `${config.iconUrl}`,
-              text          : body,
-              unfurl_links  : 1,
-              username      : `${config.slackUsername}`
-    });
-
-    slack.onError = function (err) {
-      logger.error( `Error sending slack notification: ${err}` );
-    };
-
-  } catch ( err ) {    
-    logger.error( `Error sending slack notification: ${err}` );
   }
 }
