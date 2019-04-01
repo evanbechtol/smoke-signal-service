@@ -85,7 +85,7 @@ async function userDiscussion(data) {
 
 	if (result.length > 0) {
 		data.puller={_id:creater._id,username:creater.username};
-		data.subject="Cord has been updated";
+		data.subject="Responded to cord";
 		return createNotification(data, result);
 	}
 }else{

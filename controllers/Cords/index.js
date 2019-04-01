@@ -157,17 +157,17 @@ function createCord(req, res) {
         }
 		
 		userApps
-		.find({ apps: results.app })
+		.find({ apps: results.app, 'user.username' : { $ne: results.puller.username  }})
 		.select({ __v: 0, description: 0 })
 		.exec(function (err, resp) {
+      console.log("after filterd ",resp);
 			if (err) {
 				return err;
       }
         results.subject="New Cord has been created";
-        console.log("result of subject",results);
 		    notificationController.createNotification(results, resp)
-          .then(resp => {
-            return res.send(resUtil.sendSuccess(resp));
+          .then(respData => {
+            return res.send(resUtil.sendSuccess(respData));
           }).catch(err => {
             return res.send(err);
           })
