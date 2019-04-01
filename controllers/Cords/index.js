@@ -335,7 +335,7 @@ function sendSlackNotifications(req, create) {
       logger.error( `Error sending slack notification: ${err}` );
     };
 
-  } catch ( err ) {    
+  } catch ( err ) {
     logger.error( `Error sending slack notification: ${err}` );
   }
 }
