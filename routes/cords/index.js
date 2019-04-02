@@ -99,4 +99,11 @@ router.get( "/stats/:user", auth.validateApp, cordController.getUserStats );
  */
 router.put( "/rescuers/:id", auth.validateApp, cordController.updateRescuers );
 
+/**
+ * @method GET
+ * @description Retrieve all categories
+ * @returns Status code 200 if successful with retrieved document, 500 if error occurs
+ */
+router.get( "/category/list", auth.validateApp, cordController.getCategoryList );
+
 module.exports = router;
