@@ -1,12 +1,12 @@
 const mongoose = require("mongoose");
 
-const CategoryListSchema = mongoose.Schema({
+const categoryListSchema = mongoose.Schema({
   name: {
     type: String,
     default: ""
   }
 }, {
-  collection: 'category_list'
+  collection: "CategoryList"
 });
 
-module.exports = mongoose.model("CategoryList", CategoryListSchema);
+module.exports = mongoose.model( "CategoryList", categoryListSchema );

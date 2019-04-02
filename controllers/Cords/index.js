@@ -65,6 +65,14 @@ function getCategoryList ( req, res ) {
   CategoryList
     .find( { } )
     .then(results => {
+      if(results.length == 0) {
+        results = [
+            { name: "Bug" },
+            { name: "Troubleshooting" },
+            { name: "Deployment" },
+            { name: "Others" }
+          ]
+      }
       return res.send( resUtil.sendSuccess( results ) );
     } )
     .catch(err => {
