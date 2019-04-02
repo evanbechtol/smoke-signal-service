@@ -10,9 +10,9 @@ const dbName = "db.json";
 const collectionName = "files";
 const uploadPath = "uploads";
 const db = new loki(`${uploadPath}/${dbName}`, { persistenceMethod: "fs" });
-const apps = require("../../models/Apps");
+const Apps = require("../../models/Apps");
 const notificationController = require("../../controllers/Notifications");
-const userApps = require("../../models/userApps");
+const UserApps = require("../../models/userApps");
 
 const cordsKeyWhitelist = [
   "status",
@@ -29,7 +29,6 @@ const cordsKeyWhitelist = [
 
 module.exports = {
   getCords,
-  getApps,
   getCordById,
   getCordByStatus,
   getCordForUser,
@@ -156,11 +155,10 @@ function createCord(req, res) {
           return res.status(500).send(resUtil.sendError(err));
         }
 		
-		userApps
+		UserApps
 		.find({ apps: results.app, 'user.username' : { $ne: results.puller.username  }})
 		.select({ __v: 0, description: 0 })
 		.exec(function (err, resp) {
-      console.log("after filterd ",resp);
 			if (err) {
 				return err;
       }
@@ -330,16 +328,4 @@ function deleteCord(req, res) {
   } else {
     return res.status(400).send(resUtil.sendError("Request ID was not provided"));
   }
-}
-
-function getApps(req, res) {
-  const queryStrings = qUtil.getDbQueryStrings(req.query);
-  apps
-    .find(queryStrings.query)
-    .exec(function (err, results) {
-      if (err) {
-        return res.status(500).send(resUtil.sendError(err));
-      }
-      return res.send(resUtil.sendSuccess(results));
-    });
 }

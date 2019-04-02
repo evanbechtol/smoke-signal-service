@@ -1,17 +1,6 @@
-
-const qUtil = require("../../util/queryUtil");
 const resUtil = require("../../util/responseUtil");
 const objectUtil = require("../../util");
-const logger = require("../../config/logger");
 const UserApps = require("../../models/userApps");
-const path = require("path");
-const fs = require("fs");
-const loki = require("lokijs");
-const dbName = "db.json";
-const collectionName = "files";
-const uploadPath = "uploads";
-const db = new loki(`${uploadPath}/${dbName}`, { persistenceMethod: "fs" });
-
 
 const userAppsKeyWhitelist = [
   "user",
@@ -24,13 +13,9 @@ module.exports = {
 };
 
 function getUserApps(req, res) {
-
-  console.log(">>>", req.query);
   UserApps
     .find(req.query)
     .select({ __v: 0, description: 0 })
-    // .sort( queryStrings.sort )
-    // .limit( queryStrings.limit )
     .exec(function (err, results) {
       if (err) {
         return res.status(500).send(resUtil.sendError(err));

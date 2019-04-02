@@ -25,13 +25,10 @@ function getToolNotificationUnreadList(req, res) {
 		});
 }
 
-
 function updateNotification(req, res) {
 	const _id = req.query.id || req.params.id || null;
-
 	if (_id) {
 		const updatedData = { $set: { readTimeStamp: new Date() } };
-
 		toolNotification.findByIdAndUpdate(_id, updatedData, function (err, result) {
 			if (err) {
 				return res.send(resUtil.sendError(err)) // 500 error				 
@@ -64,43 +61,44 @@ async function createNotification(result, resp) {
 }
 
 async function userDiscussion(data) {
-	
 	let lookup = {};
 	let result = [];
-	if(data.status=="Open"){
-	let creater = data.discussion[data.discussion.length - 1].user;
-	for (let item, i = 0; item = data.discussion[i++];) {
-		let id = item.user._id;
-		if ((!(id in lookup)) && (id != data.discussion[data.discussion.length - 1].user._id)) {
-			lookup[id] = 1;
-			result.push({ user: { _id: item.user._id, username: item.user.username } });
-		}
-	}
+	if (data.status == "Open") {
+		if (data.discussion.length > 0) {
+			let creater = data.discussion[data.discussion.length - 1].user;
+			for (let item, i = 0; item = data.discussion[i++];) {
+				let id = item.user._id;
+				if ((!(id in lookup)) && (id != data.discussion[data.discussion.length - 1].user._id)) {
+					lookup[id] = 1;
+					result.push({ user: { _id: item.user._id, username: item.user.username } });
+				}
+			}
 
-	if (!(data.puller._id in lookup)) {
-		if (data.puller._id != data.discussion[data.discussion.length - 1].user._id) {
-			result.push({ user: { _id: data.puller._id, username: data.puller.username } });
-		}
-	}
+			if (!(data.puller._id in lookup)) {
+				if (data.puller._id != data.discussion[data.discussion.length - 1].user._id) {
+					result.push({ user: { _id: data.puller._id, username: data.puller.username } });
+				}
+			}
 
-	if (result.length > 0) {
-		data.puller={_id:creater._id,username:creater.username};
-		data.subject="Responded to cord";
-		return createNotification(data, result);
-	}
-}else{
-	for (let item, i = 0; item = data.discussion[i++];) {
-		let id = item.user._id;
-		if ((!(id in lookup)) && (id != data.puller._id)) {
-			lookup[id] = 1;
-			result.push({ user: { _id: item.user._id, username: item.user.username } });
+			if (result.length > 0) {
+				data.puller = { _id: creater._id, username: creater.username };
+				data.subject = "Responded to cord";
+				return createNotification(data, result);
+			}
+		}
+	} else {
+		for (let item, i = 0; item = data.discussion[i++];) {
+			let id = item.user._id;
+			if ((!(id in lookup)) && (id != data.puller._id)) {
+				lookup[id] = 1;
+				result.push({ user: { _id: item.user._id, username: item.user.username } });
+			}
+		}
+		if (result.length > 0) {
+			data.subject = "Cord has been resolved";
+			return createNotification(data, result);
 		}
 	}
-	if (result.length > 0) {
-		data.subject="Cord has been resolved";
-		return createNotification(data, result);
-	}
-}
 
 }
 

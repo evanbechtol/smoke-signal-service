@@ -1,7 +1,8 @@
 const cords          = require( "./cords" ),
       uploads        = require( "./uploads" ),
       notifications  = require( "./notifications" );
-      userApps           =require("./userApps");
+      userApps       = require("./userApps");
+      apps           = require("./apps");
 const routes = app => {
   app.use( ( req, res, next ) => {
     res.setHeader( "Access-Control-Allow-Origin", "*" );
@@ -21,7 +22,8 @@ const routes = app => {
   app.use( "/cords", cords );
   app.use( "/uploads", uploads );
   app.use( "/notifications", notifications );
-  app.use("/userapps",userApps);
+  app.use("/userApps",userApps);
+  app.use("/apps",apps);
 };
 
 module.exports = routes;
