@@ -22,7 +22,7 @@ function getTemplate ( data ) {
       ]
     };
 
-    return { text, attachments };
+    return { text, attachments: [ attachments ] };
   } catch ( err ) {
     logger.error( `Error sending slack notification template: ${err}` );
   }

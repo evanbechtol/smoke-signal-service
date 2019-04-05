@@ -349,7 +349,8 @@ function sendSlackNotifications ( req, create ) {
     slack.send( {
       channel      : `${config.slackChannel}`,
       icon_emoji     : `${config.iconEmoji}`,
-      text         : body,
+      // text         : body,
+      attachments: body.attachments,
       unfurl_links : 1,
       username     : `${config.slackUsername}`
     } );
