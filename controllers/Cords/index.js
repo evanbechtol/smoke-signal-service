@@ -1,15 +1,19 @@
-const Cords          = require( "../../models/Cords" );
-const qUtil          = require( "../../util/queryUtil" );
-const resUtil        = require( "../../util/responseUtil" );
-const objectUtil     = require( "../../util" );
-const logger         = require( "../../config/logger" );
-const path           = require( "path" );
-const fs             = require( "fs" );
-const loki           = require( "lokijs" );
-const dbName         = "db.json";
-const collectionName = "files";
-const uploadPath     = "uploads";
-const db             = new loki( `${uploadPath}/${dbName}`, { persistenceMethod : "fs" } );
+const Cords                 = require( "../../models/Cords" );
+const CategoryList          = require( "../../models/CategoryList/index.js" );
+const qUtil                 = require( "../../util/queryUtil" );
+const resUtil               = require( "../../util/responseUtil" );
+const objectUtil            = require( "../../util" );
+const logger                = require( "../../config/logger" );
+const path                  = require( "path" );
+const fs                    = require( "fs" );
+const loki                  = require( "lokijs" );
+const dbName                = "db.json";
+const collectionName        = "files";
+const uploadPath            = "uploads";
+const db                    = new loki( `${uploadPath}/${dbName}`, { persistenceMethod : "fs" } );
+const config                = require( "../../config" );
+const slack                 = ( config.slackWebhookUrl !== undefined ) ? require( "slack-notify" )( `${config.slackWebhookUrl}` ) : false;
+const slackNotificationUtil = require( "../../util/slackUtil" );
 
 const cordsKeyWhitelist = [
   "status",
@@ -36,7 +40,8 @@ module.exports = {
   updateCord,
   updateRescuers,
   upload,
-  deleteCord
+  deleteCord,
+  getCategoryList
 };
 
 function getCords ( req, res ) {
@@ -56,12 +61,30 @@ function getCords ( req, res ) {
       } );
 }
 
+function getCategoryList ( req, res ) {
+  CategoryList
+      .find( {} )
+      .then( results => {
+        if ( !results.length ) {
+          results = [
+            { name : "Bug" },
+            { name : "Troubleshooting" },
+            { name : "Deployment" },
+            { name : "Others" }
+          ];
+        }
+        return res.send( resUtil.sendSuccess( results ) );
+      } )
+      .catch( err => {
+        return res.status( 500 ).send( resUtil.sendError( err ) );
+      } );
+}
+
 function getCordById ( req, res ) {
   const _id = req.query.id || req.params.id || null;
   Cords
       .findById( _id )
       .then( results => {
-        //console.log(results);
         return res.send( resUtil.sendSuccess( results ) );
       } )
       .catch( err => {
@@ -151,7 +174,7 @@ function createCord ( req, res ) {
           if ( err ) {
             return res.status( 500 ).send( resUtil.sendError( err ) );
           }
-
+          sendSlackNotifications( req, true );
           return res.send( resUtil.sendSuccess( results ) );
         } );
   } else {
@@ -180,7 +203,7 @@ function updateCord ( req, res ) {
           if ( err ) {
             return res.status( 500 ).send( resUtil.sendError( err ) );
           }
-
+          sendSlackNotifications( req, false );
           return res.send( resUtil.sendSuccess( results ) );
         } );
   } else {
@@ -254,7 +277,7 @@ async function getFilesByCordId ( req, res ) {
               return res.sendStatus( 404 );
             }
 
-            return res.send(resUtil.sendSuccess(result));
+            return res.send( resUtil.sendSuccess( result ) );
           } )
           .catch( err => {
             throw err;
@@ -269,18 +292,18 @@ async function getFilesByCordId ( req, res ) {
 
 async function getFile ( req, res ) {
   const fileName = req.query.id || req.params.id || null;
-  const col = await objectUtil.loadCollection( collectionName, db );
+  const col      = await objectUtil.loadCollection( collectionName, db );
 
   if ( fileName ) {
     try {
-            const result = col.findOne( { "filename" : fileName } );
+      const result = col.findOne( { "filename" : fileName } );
 
-            if ( !result ) {
-              return res.sendStatus( 404 );
-            }
+      if ( !result ) {
+        return res.sendStatus( 404 );
+      }
 
-            res.setHeader( "Content-Type", result.mimetype );
-             fs.createReadStream( path.join( uploadPath, result.filename ) ).pipe( res );
+      res.setHeader( "Content-Type", result.mimetype );
+      fs.createReadStream( path.join( uploadPath, result.filename ) ).pipe( res );
     } catch ( err ) {
       return res.status( 400 ).send( resUtil.sendError( err ) );
     }
@@ -304,5 +327,38 @@ function deleteCord ( req, res ) {
         } );
   } else {
     return res.status( 400 ).send( resUtil.sendError( "Request ID was not provided" ) );
+  }
+}
+
+/* send slack notifications on cord creation and modification */
+function sendSlackNotifications ( req, create ) {
+  if ( !slack ) {
+    logger.error( "The parameter slackWebhookUrl is not defined, unable to send slack notification" );
+    return false;
+  }
+  try {
+    let body, data;
+
+    data = {
+      "action"      : create, "title" : req.body.title, "username" : req.body.puller.username, "app" : req.body.app,
+      "description" : req.body.description, "category" : req.body.category, "url" : req.header( "Referer" )
+    };
+
+    body = slackNotificationUtil.getTemplate( data );
+
+    slack.send( {
+      channel      : `${config.slackChannel}`,
+      icon_url     : `${config.iconUrl}`,
+      text         : body,
+      unfurl_links : 1,
+      username     : `${config.slackUsername}`
+    } );
+
+    slack.onError = function ( err ) {
+      logger.error( `Error sending slack notification: ${err}` );
+    };
+
+  } catch ( err ) {
+    logger.error( `Error sending slack notification: ${err}` );
   }
 }
