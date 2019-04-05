@@ -77,7 +77,7 @@ function connMsg ( action, id, nsp ) {
  * @param error Error object
  * @param req {object} Express req object
  * @param res {object} Express res object
- * @param next {object} Express next object
+ * @param next {function} Express next object
  * @returns {*}
  */
 function errorHandler ( error, req, res, next ) {
