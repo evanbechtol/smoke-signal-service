@@ -9,7 +9,7 @@ const bodyParser  = require( "body-parser" ),
       logger      = require( "./config/logger" );
 
 // This is dangerous a.f., but has to be done for prod
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 //require('ssl-root-cas/latest').inject();
 
 mongoose.Promise = global.Promise;
@@ -40,6 +40,10 @@ mongoose.connect( config.dbUrl, {
   // Pass app to routes
   routes( app );
 
+  // Setup error handling, this must be after all other middleware
+  app.use( errorHandler );
+
+
   // Start application
   const server = app.listen( config.port, () => {
     logger.info( `Express running, now listening on port ${config.port}` );
@@ -66,4 +70,40 @@ mongoose.connect( config.dbUrl, {
 
 function connMsg ( action, id, nsp ) {
   return `User ID '${id}' ${action} from namespace ${nsp}`;
+}
+
+/**
+ * @description Default error handler to be used with express
+ * @param error Error object
+ * @param req {object} Express req object
+ * @param res {object} Express res object
+ * @param next {object} Express next object
+ * @returns {*}
+ */
+function errorHandler ( error, req, res, next ) {
+  let parsedError;
+
+  // Attempt to gracefully parse error object
+  try {
+    if ( error && typeof error === "object" ) {
+      parsedError = JSON.stringify( error );
+    } else {
+      parsedError = error;
+    }
+  } catch ( e ) {
+    logger.error( e );
+  }
+
+  // Log the original error
+  logger.error( parsedError );
+
+  // If response is already sent, don't attempt to respond to client
+  if ( res.headersSent ) {
+    return next( error );
+  }
+
+  res.status( 400 ).json( {
+    success : false,
+    error
+  } );
 }
