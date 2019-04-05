@@ -7,8 +7,8 @@ const config = {
   viewEngine 		: process.env.VIEW_ENGINE || 'html',
   slackWebhookUrl 	: process.env.SLACK_WEBHOOK_URL,
   slackChannel 		: process.env.SLACK_CHANNEL || '#test_smoke_signal',
-  iconUrl 			: process.env.ICON_URL || 'https://uat.eams.ericsson.net/eams/web/img/logo.png',
-  slackUsername		: process.env.SLACK_USERNAME || 'Smoke Signal'
+  iconEmoji 			: process.env.ICON_URL || ':econ:',
+  slackUsername		: process.env.SLACK_USERNAME || 'Hero'
 };
 
 module.exports = config;

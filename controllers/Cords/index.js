@@ -348,7 +348,7 @@ function sendSlackNotifications ( req, create ) {
 
     slack.send( {
       channel      : `${config.slackChannel}`,
-      icon_url     : `${config.iconUrl}`,
+      icon_emoji     : `${config.iconEmoji}`,
       text         : body,
       unfurl_links : 1,
       username     : `${config.slackUsername}`
