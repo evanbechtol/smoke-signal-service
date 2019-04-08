@@ -10,6 +10,6 @@ let router = express.Router();
  * @param body {object} Object used to create the document
  * @returns Status code 200 if successful with created document, 500 if error occurs
  */
-router.post( "/createUserApps", auth.validateApp, userAppsController.createUserApps );
+router.post( "/", auth.validateApp, userAppsController.createUserApps );
 
 module.exports = router;
