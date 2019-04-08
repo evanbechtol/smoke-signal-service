@@ -23,8 +23,8 @@ const routes = app => {
   app.use( "/cords", cords );
   app.use( "/uploads", uploads );
   app.use( "/notifications", notifications );
-  app.use( "/userApps", userApps );
-  app.use( "/apps", apps );
+  app.use( "/UserApps", userApps );
+  app.use( "/Apps", apps );
 };
 
 module.exports = routes;
