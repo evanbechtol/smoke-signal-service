@@ -14,9 +14,8 @@ const db                    = new loki( `${uploadPath}/${dbName}`, { persistence
 const config                = require( "../../config" );
 const slack                 = ( config.slackWebhookUrl !== undefined ) ? require( "slack-notify" )( `${config.slackWebhookUrl}` ) : false;
 const slackNotificationUtil = require( "../../util/slackUtil" );
-const Apps = require("../../models/Apps");
-const notificationController = require("../../controllers/Notifications");
-const UserApps = require("../../models/userApps");
+const notificationController = require( "../../controllers/Notifications" );
+const UserApps = require( "../../models/userApps" );
 
 const cordsKeyWhitelist = [
   "status",
@@ -47,7 +46,7 @@ module.exports = {
   getCategoryList
 };
 
-function getCords(req, res) {
+function getCords( req, res ) {
   const queryStrings = qUtil.getDbQueryStrings(req.query);
 
   Cords
@@ -95,7 +94,7 @@ function getCordById ( req, res ) {
       } );
 }
 
-function getCordByStatus(req, res) {
+function getCordByStatus( req, res ) {
   const status = req.query.status || req.params.status || null;
   Cords
     .find({ status })
@@ -177,22 +176,26 @@ function createCord(req, res) {
           return res.status(500).send(resUtil.sendError(err));
         }
 		
-		UserApps
-		.find({ apps: results.app, 'user.username' : { $ne: results.puller.username  }})
-		.select({ __v: 0, description: 0 })
-		.exec(function (err, resp) {
-			if (err) {
-				return err;
-      }
-		sendSlackNotifications( req, true );
-        results.subject="New Cord has been created";
-		    notificationController.createNotification(results, resp)
+		UserApps.find({
+      apps: results.app,
+      "user.username": { $ne: results.puller.username }
+    })
+      .select({ __v: 0, description: 0 })
+      .exec(function(err, resp) {
+        if (err) {
+          return err;
+        }
+        sendSlackNotifications( req, true );
+        results.subject = "New Cord has been created";
+        notificationController
+          .createNotification(results, resp)
           .then(respData => {
             return res.send(resUtil.sendSuccess(respData));
-          }).catch(err => {
-            return res.send(err);
           })
-		})
+          .catch(err => {
+            return res.send(err);
+          });
+      });
 		
       });
   } else {

@@ -5,6 +5,7 @@ const schema = mongoose.Schema({
     user: {
         _id: {
             type: String,
+            index: true,
             required: true
         },
         username: {
@@ -18,4 +19,5 @@ const schema = mongoose.Schema({
 
 });
 
-module.exports = mongoose.model("user_apps", schema);
+
+module.exports = mongoose.model("User_Apps", schema);
