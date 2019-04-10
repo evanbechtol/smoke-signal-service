@@ -1,21 +1,19 @@
-const Cords                  = require( "../../models/Cords" );
-const CategoryList           = require( "../../models/CategoryList/index.js" );
-const qUtil                  = require( "../../util/queryUtil" );
-const resUtil                = require( "../../util/responseUtil" );
-const objectUtil             = require( "../../util" );
-const logger                 = require( "../../config/logger" );
-const path                   = require( "path" );
-const fs                     = require( "fs" );
-const loki                   = require( "lokijs" );
-const dbName                 = "db.json";
-const collectionName         = "files";
-const uploadPath             = "uploads";
-const db                     = new loki( `${uploadPath}/${dbName}`, { persistenceMethod : "fs" } );
-const config                 = require( "../../config" );
-const slack                  = ( config.slackWebhookUrl !== undefined ) ? require( "slack-notify" )( `${config.slackWebhookUrl}` ) : false;
-const slackNotificationUtil  = require( "../../util/slackUtil" );
-const notificationController = require( "../../controllers/Notifications" );
-const UserApps               = require( "../../models/UserApps" );
+const Cords                 = require( "../../models/Cords" );
+const CategoryList          = require( "../../models/CategoryList/index.js" );
+const qUtil                 = require( "../../util/queryUtil" );
+const resUtil               = require( "../../util/responseUtil" );
+const objectUtil            = require( "../../util" );
+const logger                = require( "../../config/logger" );
+const path                  = require( "path" );
+const fs                    = require( "fs" );
+const loki                  = require( "lokijs" );
+const dbName                = "db.json";
+const collectionName        = "files";
+const uploadPath            = "uploads";
+const db                    = new loki( `${uploadPath}/${dbName}`, { persistenceMethod : "fs" } );
+const config                = require( "../../config" );
+const slack                 = ( config.slackWebhookUrl !== undefined ) ? require( "slack-notify" )( `${config.slackWebhookUrl}` ) : false;
+const slackNotificationUtil = require( "../../util/slackUtil" );
 
 const cordsKeyWhitelist = [
   "status",
@@ -56,7 +54,6 @@ function getCords ( req, res ) {
       .limit( queryStrings.limit )
       .exec( function ( err, results ) {
         if ( err ) {
-          logger.error( err );
           return res.status( 500 ).send( resUtil.sendError( err ) );
         }
 
@@ -79,7 +76,6 @@ function getCategoryList ( req, res ) {
         return res.send( resUtil.sendSuccess( results ) );
       } )
       .catch( err => {
-        logger.error( err );
         return res.status( 500 ).send( resUtil.sendError( err ) );
       } );
 }
@@ -92,7 +88,6 @@ function getCordById ( req, res ) {
         return res.send( resUtil.sendSuccess( results ) );
       } )
       .catch( err => {
-        logger.error( err );
         return res.status( 500 ).send( resUtil.sendError( err ) );
       } );
 }
@@ -104,7 +99,6 @@ function getCordByStatus ( req, res ) {
       .sort( { openedOn : -1 } )
       .exec( function ( err, results ) {
         if ( err ) {
-          logger.error( err );
           return res.status( 500 ).send( resUtil.sendError( err ) );
         }
 
@@ -128,7 +122,6 @@ function getCordForUser ( req, res ) {
       .sort( { openedOn : -1 } )
       .exec( function ( err, results ) {
         if ( err ) {
-          logger.error( err );
           return res.status( 500 ).send( resUtil.sendError( err ) );
         }
 
@@ -167,7 +160,6 @@ function getUserStats ( req, res ) {
         return res.send( resUtil.sendSuccess( stats ) );
       } )
       .catch( err => {
-        logger.error( err );
         return res.status( 500 ).send( resUtil.sendError( err ) );
       } );
 }
@@ -176,38 +168,14 @@ function getUserStats ( req, res ) {
 function createCord ( req, res ) {
   if ( req.body ) {
     const body = objectUtil.whitelist( req.body, cordsKeyWhitelist );
-    let createdCord;
 
     Cords
-        .create( body )
-        // Cord has been created
-        .then( cordCreateResponse => {
-          createdCord = cordCreateResponse;
-
-          const userAppsQuery = {
-            apps            : cordCreateResponse.app,
-            "user.username" : { $ne : cordCreateResponse.puller.username }
-          };
-            if ( createdCord && createdCord._doc ) {
-              createdCord = createdCord._doc;
-              return UserApps.find( userAppsQuery ).select( { __v : 0, description : 0 } );
-            } else {
-              throw "Server error creating cord";
-            }
-        })
-        // Cord created, user apps query is finished, now create the notification
-        .then( userAppsResponse => {
+        .create( body, function ( err, results ) {
+          if ( err ) {
+            return res.status( 500 ).send( resUtil.sendError( err ) );
+          }
           sendSlackNotifications( req, true );
-          createdCord.subject = "New Cord has been created";
-          return notificationController.createNotification( createdCord, userAppsResponse );
-        })
-        // Cord created, user apps query is finished, notification created, respond to client
-        .then( notificationCreateResponse => {
-          return res.send( resUtil.sendSuccess( notificationCreateResponse ) );
-        } )
-        .catch( err => {
-          logger.error( err );
-          return res.status( 500 ).send( resUtil.sendError( err ) );
+          return res.send( resUtil.sendSuccess( results ) );
         } );
   } else {
     return res.status( 400 ).send( resUtil.sendError( "Request body not provided" ) );
@@ -236,13 +204,7 @@ function updateCord ( req, res ) {
             return res.status( 500 ).send( resUtil.sendError( err ) );
           }
           sendSlackNotifications( req, false );
-          notificationController.userDiscussion( results ).then( resp => {
-            return res.send( resUtil.sendSuccess( resp ) );
-          } ).catch( err => {
-            logger.error( err );
-            return res.status( 500 ).send( resUtil.sendError( err ) );
-          } );
-
+          return res.send( resUtil.sendSuccess( results ) );
         } );
   } else {
     return res.status( 400 ).send( resUtil.sendError( "Request ID or Body was not provided" ) );
@@ -263,7 +225,6 @@ function updateRescuers ( req, res ) {
           return res.send( resUtil.sendSuccess( results ) );
         } )
         .catch( err => {
-          logger.error( err );
           return res.status( 500 ).send( resUtil.sendError( err ) );
         } );
   } else {
@@ -285,16 +246,13 @@ async function upload ( req, res ) {
               return res.send( response );
             } )
             .catch( err => {
-              logger.error( err );
-              return res.status( 500 ).send( resUtil.sendError( err ) );
+              throw err;
             } );
       } else {
-        logger.error( "Error uploading file, please try again" );
         return res.status( 500 ).send( resUtil.sendError( "Error uploading file, please try again" ) );
       }
 
     } catch ( err ) {
-      logger.error( err );
       return res.status( 400 ).send( resUtil.sendError( err ) );
     }
   } else {
@@ -322,11 +280,9 @@ async function getFilesByCordId ( req, res ) {
             return res.send( resUtil.sendSuccess( result ) );
           } )
           .catch( err => {
-            logger.error( err );
             throw err;
           } );
     } catch ( err ) {
-      logger.error( err );
       return res.status( 400 ).send( resUtil.sendError( err ) );
     }
   } else {
@@ -336,8 +292,7 @@ async function getFilesByCordId ( req, res ) {
 
 async function getFile ( req, res ) {
   const fileName = req.query.id || req.params.id || null;
-
-  const col = await objectUtil.loadCollection( collectionName, db );
+  const col      = await objectUtil.loadCollection( collectionName, db );
 
   if ( fileName ) {
     try {
@@ -350,7 +305,6 @@ async function getFile ( req, res ) {
       res.setHeader( "Content-Type", result.mimetype );
       fs.createReadStream( path.join( uploadPath, result.filename ) ).pipe( res );
     } catch ( err ) {
-      logger.error( err );
       return res.status( 400 ).send( resUtil.sendError( err ) );
     }
   } else {
@@ -366,7 +320,6 @@ function deleteCord ( req, res ) {
         .findByIdAndDelete( _id )
         .exec( function ( err, results ) {
           if ( err ) {
-            logger.error( err );
             return res.status( 500 ).send( resUtil.sendError( err ) );
           }
 
