@@ -40,6 +40,9 @@ mongoose.connect( config.dbUrl, {
   // Pass app to routes
   routes( app );
 
+  // Setup error handling
+  app.use(errorHandler);
+
   // Start application
   const server = app.listen( config.port, () => {
     logger.info( `Express running, now listening on port ${config.port}` );
@@ -66,4 +69,11 @@ mongoose.connect( config.dbUrl, {
 
 function connMsg ( action, id, nsp ) {
   return `User ID '${id}' ${action} from namespace ${nsp}`;
+}
+
+function errorHandler(error, req, res, next) {
+  logger.error( error );
+  if ( res.headersSent ) {
+    return  next(error);
+  }
 }

@@ -1,5 +1,8 @@
-const cords          = require( "./cords" ),
-      uploads        = require( "./uploads" );
+const cords         = require( "./cords" ),
+      uploads       = require( "./uploads" ),
+      notifications = require( "./notifications" ),
+      userApps      = require( "./userApps" ),
+      apps          = require( "./apps" );
 
 const routes = app => {
   app.use( ( req, res, next ) => {
@@ -19,6 +22,9 @@ const routes = app => {
 
   app.use( "/cords", cords );
   app.use( "/uploads", uploads );
+  app.use( "/notifications", notifications );
+  app.use( "/user", userApps );
+  app.use( "/apps", apps );
 };
 
 module.exports = routes;

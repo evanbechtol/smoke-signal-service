@@ -59,3 +59,5 @@ typings/
 
 # dotidea folders used by webstorm
 .idea/
+
+uploads/
