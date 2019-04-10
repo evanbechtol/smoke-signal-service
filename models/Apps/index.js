@@ -5,8 +5,7 @@ const schema = mongoose.Schema({
     type: String,
     index: true,
     default: ""
-  },
-
+  }
 });
 
 module.exports = mongoose.model("Apps", schema);

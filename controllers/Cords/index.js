@@ -15,7 +15,7 @@ const config                 = require( "../../config" );
 const slack                  = ( config.slackWebhookUrl !== undefined ) ? require( "slack-notify" )( `${config.slackWebhookUrl}` ) : false;
 const slackNotificationUtil  = require( "../../util/slackUtil" );
 const notificationController = require( "../../controllers/Notifications" );
-const UserApps               = require( "../../models/userApps" );
+const UserApps               = require( "../../models/UserApps" );
 
 const cordsKeyWhitelist = [
   "status",
@@ -176,36 +176,38 @@ function getUserStats ( req, res ) {
 function createCord ( req, res ) {
   if ( req.body ) {
     const body = objectUtil.whitelist( req.body, cordsKeyWhitelist );
+    let createdCord;
+
     Cords
-        .create( body, function ( err, results ) {
-          if ( err ) {
-            logger.error( err );
-            return res.status( 500 ).send( resUtil.sendError( err ) );
-          }
+        .create( body )
+        // Cord has been created
+        .then( cordCreateResponse => {
+          createdCord = cordCreateResponse;
 
-          UserApps.find( {
-            apps            : results.app,
-            "user.username" : { $ne : results.puller.username }
-          } )
-              .select( { __v : 0, description : 0 } )
-              .exec( function ( err, resp ) {
-                if ( err ) {
-                  logger.error( err );
-                  return err;
-                }
-                sendSlackNotifications( req, true );
-                results.subject = "New Cord has been created";
-                notificationController
-                    .createNotification( results, resp )
-                    .then( respData => {
-                      return res.send( resUtil.sendSuccess( respData ) );
-                    } )
-                    .catch( err => {
-                      logger.error( err );
-                      return res.send( err );
-                    } );
-              } );
-
+          const userAppsQuery = {
+            apps            : cordCreateResponse.app,
+            "user.username" : { $ne : cordCreateResponse.puller.username }
+          };
+            if ( createdCord && createdCord._doc ) {
+              createdCord = createdCord._doc;
+              return UserApps.find( userAppsQuery ).select( { __v : 0, description : 0 } );
+            } else {
+              throw "Server error creating cord";
+            }
+        })
+        // Cord created, user apps query is finished, now create the notification
+        .then( userAppsResponse => {
+          sendSlackNotifications( req, true );
+          createdCord.subject = "New Cord has been created";
+          return notificationController.createNotification( createdCord, userAppsResponse );
+        })
+        // Cord created, user apps query is finished, notification created, respond to client
+        .then( notificationCreateResponse => {
+          return res.send( resUtil.sendSuccess( notificationCreateResponse ) );
+        } )
+        .catch( err => {
+          logger.error( err );
+          return res.status( 500 ).send( resUtil.sendError( err ) );
         } );
   } else {
     return res.status( 400 ).send( resUtil.sendError( "Request body not provided" ) );

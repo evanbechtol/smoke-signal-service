@@ -1,6 +1,6 @@
 const resUtil              = require( "../../util/responseUtil" );
 const objectUtil           = require( "../../util" );
-const UserApps             = require( "../../models/userApps" );
+const UserApps             = require( "../../models/UserApps" );
 const logger               = require( "../../config/logger" );
 const userAppsKeyWhitelist = [ "user", "apps" ];
 
