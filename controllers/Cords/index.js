@@ -16,19 +16,7 @@ const slack                  = ( config.slackWebhookUrl !== undefined ) ? requir
 const slackNotificationUtil  = require( "../../util/slackUtil" );
 const notificationController = require( "../../controllers/Notifications" );
 const UserApps               = require( "../../models/UserApps" );
-
-const cordsKeyWhitelist = [
-  "status",
-  "description",
-  "app",
-  "category",
-  "puller",
-  "rescuers",
-  "openedOn",
-  "title",
-  "likes",
-  "tags"
-];
+const cordsWhiteList         = require( "../../config/whitelists" ).cords;
 
 module.exports = {
   getCords,
@@ -175,7 +163,7 @@ function getUserStats ( req, res ) {
 // Todo: create callback to send notification when cord created
 function createCord ( req, res ) {
   if ( req.body ) {
-    const body = objectUtil.whitelist( req.body, cordsKeyWhitelist );
+    const body = objectUtil.whitelist( req.body, cordsWhiteList.model );
     let createdCord;
 
     Cords
@@ -216,19 +204,9 @@ function createCord ( req, res ) {
 
 function updateCord ( req, res ) {
   const _id                 = req.query.id || req.params.id || null;
-  const updateCordWhitelist = [
-    "status",
-    "description",
-    "discussion",
-    "app",
-    "category",
-    "rescuers",
-    "resolvedOn",
-    "title",
-    "tags"
-  ];
+
   if ( _id && req.body ) {
-    const body = objectUtil.whitelist( req.body, updateCordWhitelist );
+    const body = objectUtil.whitelist( req.body, cordsWhiteList.update );
     Cords
         .findByIdAndUpdate( _id, body, { new : true } )
         .exec( function ( err, results ) {
@@ -251,9 +229,9 @@ function updateCord ( req, res ) {
 
 function updateRescuers ( req, res ) {
   const _id                 = req.query.id || req.params.id || null;
-  const updateCordWhitelist = [ "rescuers" ];
+  const updateRescuersWhitelist = [ "rescuers" ];
   if ( _id && req.body && req.body.rescuers ) {
-    const body = objectUtil.whitelist( req.body, updateCordWhitelist );
+    const body = objectUtil.whitelist( req.body, updateRescuersWhitelist );
     Cords
         .findByIdAndUpdate( _id, { $addToSet : { "rescuers" : { $each : body.rescuers } } }, { new : true } )
         .then( results => {
