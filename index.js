@@ -41,7 +41,7 @@ mongoose.connect( config.dbUrl, {
   routes( app );
 
   // Setup error handling
-  app.use(errorHandler);
+  app.use( errorHandler );
 
   // Start application
   const server = app.listen( config.port, () => {
@@ -71,9 +71,9 @@ function connMsg ( action, id, nsp ) {
   return `User ID '${id}' ${action} from namespace ${nsp}`;
 }
 
-function errorHandler(error, req, res, next) {
+function errorHandler ( error, req, res, next ) {
   logger.error( error );
   if ( res.headersSent ) {
-    return  next(error);
+    return next( error );
   }
 }
