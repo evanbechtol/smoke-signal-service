@@ -1,6 +1,7 @@
 const resUtil = require( "../../util/responseUtil" );
 const qUtil   = require( "../../util/queryUtil" );
 const Apps    = require( "../../models/Apps" );
+const logger  = require( "../../config/logger" );
 
 
 module.exports = {
@@ -13,6 +14,7 @@ function getApps ( req, res ) {
       .find( queryStrings.query )
       .exec( function ( err, results ) {
         if ( err ) {
+          logger.error( err );
           return res.status( 500 ).send( resUtil.sendError( err ) );
         }
         return res.send( resUtil.sendSuccess( results ) );
