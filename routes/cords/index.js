@@ -16,6 +16,7 @@ let router = express.Router();
  * @returns Status code 200 and data if query successful. 500 if an error occurs
  */
 router.get( "/get", auth.validateApp, cordController.getCords );
+
 /**
  * @method POST
  * @description Create a cord, provided that all required keys are provided

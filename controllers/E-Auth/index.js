@@ -7,7 +7,7 @@ module.exports = { validateApp };
 
 function validateApp ( req, res, next ) {
   let token      = ( req.headers && req.headers.authorization !== undefined ) ? req.headers.authorization.slice( 7 ) : req.query.appToken || req.params.appToken || req.body.appToken;
-  const endpoint = "e_auth/validate/Apps";
+  const endpoint = "e_auth/validate/apps";
   const url      = `${config.eAuthUrl}/${endpoint}?token=${token}`;
   const options  = { auth : { bearer : token } };
 
