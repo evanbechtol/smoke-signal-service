@@ -20,4 +20,4 @@ const schema = mongoose.Schema({
 });
 
 
-module.exports = mongoose.model("User_Apps", schema);
+module.exports = mongoose.model("UserApps", schema);

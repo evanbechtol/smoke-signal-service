@@ -61,4 +61,4 @@ const schema = mongoose.Schema( {
 schema.index( { notifyReceiver : 1, readTimeStamp: 1 } );
 schema.index( { notifyReceiver : 1 } );
 schema.index( { readTimeStamp : 1 } );
-module.exports = mongoose.model( "tool_notifications", schema );
+module.exports = mongoose.model( "ToolNotifications", schema );
