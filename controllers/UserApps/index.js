@@ -2,7 +2,7 @@ const resUtil              = require( "../../util/responseUtil" );
 const objectUtil           = require( "../../util" );
 const UserApps             = require( "../../models/UserApps" );
 const logger               = require( "../../config/logger" );
-const userAppsKeyWhitelist = [ "user", "apps" ];
+const userAppsKeyWhitelist = require( "../../config/whitelists").userApps;
 
 module.exports = {
   createUserApps
@@ -11,7 +11,7 @@ module.exports = {
 // Todo: create callback to create UserApps when user registered
 function createUserApps ( req, res ) {
   if ( req.body ) {
-    const body = objectUtil.whitelist( req.body, userAppsKeyWhitelist );
+    const body = objectUtil.whitelist( req.body, userAppsKeyWhitelist.model );
     UserApps.create( body, function ( err, results ) {
       if ( err ) {
         logger.error( err );
