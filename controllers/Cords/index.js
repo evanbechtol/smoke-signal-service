@@ -14,7 +14,7 @@ const db                     = new loki( `${uploadPath}/${dbName}`, { persistenc
 const config                 = require( "../../config" );
 const slack                  = ( config.slackWebhookUrl !== undefined ) ? require( "slack-notify" )( `${config.slackWebhookUrl}` ) : false;
 const slackNotificationUtil  = require( "../../util/slackUtil" );
-const notificationController = require( "../../controllers/Notifications" );
+const notificationController = require( "../Notifications" );
 const UserApps               = require( "../../models/UserApps" );
 const cordsWhiteList         = require( "../../config/whitelists" ).cords;
 
