@@ -5,8 +5,6 @@ const CategoryListSchema = mongoose.Schema({
     type: String,
     default: ""
   }
-}, {
-  collection: 'category_list'
 });
 
 module.exports = mongoose.model("CategoryList", CategoryListSchema);
