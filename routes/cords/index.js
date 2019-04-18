@@ -15,7 +15,7 @@ let router = express.Router();
  * @param query {string} Optionally pass in to control the query performed by MongoDB
  * @returns Status code 200 and data if query successful. 500 if an error occurs
  */
-router.get( "/get", auth.validateApp, cordController.getCords );
+router.get( "/", /*auth.validateApp,*/ cordController.getCords );
 
 /**
  * @method POST
@@ -23,7 +23,7 @@ router.get( "/get", auth.validateApp, cordController.getCords );
  * @param body {object} Object used to create the document
  * @returns Status code 200 if successful with created document, 500 if error occurs
  */
-router.post( "/create", auth.validateApp, cordController.createCord );
+router.post( "/", auth.validateApp, cordController.createCord );
 
 /**
  * @method POST
