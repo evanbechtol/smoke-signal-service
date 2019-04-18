@@ -15,7 +15,7 @@ let router = express.Router();
  * @param query {string} Optionally pass in to control the query performed by MongoDB
  * @returns Status code 200 and data if query successful. 500 if an error occurs
  */
-router.get( "/", /*auth.validateApp,*/ cordController.getCords );
+router.get( "/", auth.validateApp, cordController.getCords );
 
 /**
  * @method POST
