@@ -8,65 +8,64 @@ const bodyParser  = require( "body-parser" ),
       mongoose    = require( "mongoose" ),
       logger      = require( "./config/logger" );
 
-// This is dangerous a.f., but has to be done for prod
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-//require('ssl-root-cas/latest').inject();
-
-mongoose.Promise = global.Promise;
-mongoose.connect( config.dbUrl, {
+const mongooseOptions = {
   useCreateIndex  : true,
   useNewUrlParser : true,
   autoReconnect   : true
-}, ( err ) => {
-  if ( err ) {
-    throw err;
-  }
-  logger.info( "Database connection successful" );
+};
 
-  let app = express();
+mongoose.Promise = global.Promise;
+mongoose.connect( config.dbUrl, mongooseOptions )
+    .then( () => {
+      logger.info( "Database connection successful" );
 
-// Serve static content
-  app.use( express.static( path.join( __dirname, "uploads" ) ) );
+      let app = express();
 
-// Set up middleware
-  app.use( morgan( "dev" ) );
-  app.use( compression() );
-  app.use( bodyParser.urlencoded( {
-    extended : false,
-    limit    : "20mb"
-  } ) );
-  app.use( bodyParser.json( { limit : "20mb" } ) );
+      // Serve static content
+      app.use( express.static( path.join( __dirname, "uploads" ) ) );
 
-  // Pass app to routes
-  routes( app );
+      // Set up middleware
+      app.use( morgan( "dev" ) );
+      app.use( compression() );
+      app.use( bodyParser.urlencoded( {
+        extended : false,
+        limit    : "20mb"
+      } ) );
+      app.use( bodyParser.json( { limit : "20mb" } ) );
 
-  // Setup error handling, this must be after all other middleware
-  app.use( errorHandler );
+      // Pass app to routes
+      routes( app );
 
+      // Setup error handling, this must be after all other middleware
+      app.use( errorHandler );
 
-  // Start application
-  const server = app.listen( config.port, () => {
-    logger.info( `Express running, now listening on port ${config.port}` );
-  } );
+      // Start application
+      const server = app.listen( config.port, () => {
+        logger.info( `Express running, now listening on port ${config.port}` );
+      } );
 
-  const io = require( "socket.io" )( server, { path : "/smoke-signal-service/socket.io" } );
-  io.origins( "*:*" );
-  io.on( "connection", function ( socket ) {
-    logger.info( connMsg( socket.id, "connected", "/" ) );
-    require( "./controllers/Socket" )( io, socket );
-    socket.on( "disconnect", function () {
-      logger.info( connMsg( socket.id, "disconnected", "/" ) );
+      const io = require( "socket.io" )( server, { path : "/smoke-signal-service/socket.io" } );
+      io.origins( "*:*" );
+      io.on( "connection", function ( socket ) {
+        logger.info( connMsg( socket.id, "connected", "/" ) );
+        require( "./controllers/Socket" )( io, socket );
+        socket.on( "disconnect", function () {
+          logger.info( connMsg( socket.id, "disconnected", "/" ) );
+        } );
+      } );
+
+      io.of( "/smoke-signal-service" ).on( "connection", function ( socket ) {
+        logger.info( connMsg( socket.id, "connected", "/smoke-signal/" ) );
+        require( "./controllers/Socket" )( io, socket );
+        socket.on( "disconnect", function () {
+          logger.info( connMsg( socket.id, "disconnected", "/smoke-signal/" ) );
+        } );
+      } );
+    } )
+    .catch( err => {
+      console.error( err );
+      logger.error( err );
     } );
-  } );
-
-  io.of( "/smoke-signal-service" ).on( "connection", function ( socket ) {
-    logger.info( connMsg( socket.id, "connected", "/smoke-signal/" ) );
-    require( "./controllers/Socket" )( io, socket );
-    socket.on( "disconnect", function () {
-      logger.info( connMsg( socket.id, "disconnected", "/smoke-signal/" ) );
-    } );
-  } );
-} );
 
 function connMsg ( action, id, nsp ) {
   return `User ID '${id}' ${action} from namespace ${nsp}`;
