@@ -6,7 +6,7 @@ const bodyParser  = require( "body-parser" ),
       routes      = require( "./routes" ),
       compression = require( "compression" ),
       mongoose    = require( "mongoose" ),
-      logger      = require( "./config/logger" );
+      logger      = require( "./services/Logger" );
 
 const mongooseOptions = {
   useCreateIndex  : true,

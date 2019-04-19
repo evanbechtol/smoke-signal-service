@@ -1,5 +1,5 @@
 const config = require( "../config" );
-const logger = require( "../config/logger" );
+const logger = require( "./Logger" );
 const Slack = ( config.slackWebhookUrl !== undefined ) ? require( "slack-notify" )( `${config.slackWebhookUrl}` ) : false;
 
 class SlackService {

@@ -1,5 +1,5 @@
 const config  = require( "../../config" );
-const logger  = require( "../../config/logger" );
+const logger  = require( "../../services/Logger" );
 const resUtil = require( "../../util/responseUtil" );
 const request = require( "request" );
 

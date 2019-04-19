@@ -5,7 +5,7 @@ const CategoryList = require( "../../models/CategoryList/index.js" );
 const qUtil = require( "../../util/queryUtil" );
 const resUtil = require( "../../util/responseUtil" );
 const objectUtil = require( "../../util" );
-const logger = require( "../../config/logger" );
+const logger = require( "../../services/Logger" );
 
 // Todo: Remove all unused dependencies after refactor complete
 const path = require( "path" );

@@ -1,4 +1,4 @@
-const logger = require( "../../config/logger" );
+const logger = require( "../../services/Logger" );
 
 function getDbQueryStrings ( queryString = {}) {
   let query     = queryString.query || {},

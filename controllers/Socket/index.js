@@ -1,4 +1,4 @@
-const logger = require( "../../config/logger" );
+const logger = require( "../../services/Logger" );
 const Cords  = require( "../../models/Cords" );
 const qUtil  = require( "../../util/queryUtil" );
 
