@@ -1,6 +1,6 @@
 const MongooseService = require( "./MongooseService" );
-const ObjectUtil = require( "../util" );
 const loki = require( "lokijs" );
+const LokiService = require( "./LokiService" );
 const dbName = "db.json";
 const collectionName = "files";
 const uploadPath = "uploads";
@@ -55,7 +55,7 @@ class CordService {
    */
   async getFilesByCordId ( id, projection = { __v: 0 }, options ) {
     const defaultQueryOptions = { lean: true };
-    const col = await ObjectUtil.loadCollection( collectionName, db );
+    const col = await LokiService.loadCollection( collectionName, db );
 
     options = Object.assign( {}, defaultQueryOptions, options );
     const cordData = await this.mongooseServiceInstance.findById( id, projection, options );
@@ -101,7 +101,7 @@ class CordService {
    * @returns {Promise} Returns result of Mongoose query
    */
   async upload ( id, file ) {
-    const col = await ObjectUtil.loadCollection( collectionName, db );
+    const col = await LokiService.loadCollection( collectionName, db );
     const data = col.insert( file );
 
     // Save the file to the database
@@ -119,7 +119,7 @@ class CordService {
    * @returns {Promise} Returns result of Mongoose query
    */
   static async getFile ( fileName ) {
-    const col = await ObjectUtil.loadCollection( collectionName, db );
+    const col = await LokiService.loadCollection( collectionName, db );
     return col.findOne( { "filename": fileName } );
   }
 

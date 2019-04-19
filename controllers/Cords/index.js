@@ -3,11 +3,11 @@ const CordService = require( "../../services/CordService" );
 const SlackService = require( "../../services/SlackService" );
 const CategoryList = require( "../../models/CategoryList/index.js" );
 const qUtil = require( "../../util/queryUtil" );
-const resUtil = require( "../../util/responseUtil" );
+const resUtil = require( "../../middlewares/responseMiddleware" );
 const objectUtil = require( "../../util" );
 const logger = require( "../../services/Logger" );
 
-// Todo: Remove all unused dependencies after refactor complete
+// Required for retrieving uploaded files
 const path = require( "path" );
 const fs = require( "fs" );
 const uploadPath = "uploads";
