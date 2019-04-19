@@ -1,5 +1,5 @@
 const express        = require( "express" );
-const auth           = require( "../../controllers/E-Auth" );
+const auth           = require( "../../middlewares/eAuth" );
 const cordController = require( "../../controllers/Cords" );
 
 let router = express.Router();
