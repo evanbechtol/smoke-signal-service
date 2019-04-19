@@ -1,6 +1,6 @@
 const config = require( "../config" );
 const logger = require( "../services/Logger" );
-const resUtil = require( "./responseMiddleware" );
+const resUtil = require( "./response" );
 const request = require( "request" );
 
 module.exports = { validateApp };

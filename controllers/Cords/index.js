@@ -3,7 +3,7 @@ const CordService = require( "../../services/CordService" );
 const SlackService = require( "../../services/SlackService" );
 const CategoryList = require( "../../models/CategoryList/index.js" );
 const qUtil = require( "../../util/queryUtil" );
-const resUtil = require( "../../middlewares/responseMiddleware" );
+const resUtil = require( "../../middlewares/response" );
 const logger = require( "../../services/Logger" );
 const CordsWhitelist = require( "../../config/keysWhitelists/cords" );
 
