@@ -1,5 +1,5 @@
 const logger = require( "../../services/Logger" );
-
+// Todo: Refactor this into  middleware, add the stuff to the req object
 function getDbQueryStrings ( queryString = {}) {
   let query     = queryString.query || {},
       searchStr = queryString.searchstr || null,

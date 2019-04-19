@@ -1,5 +1,4 @@
 module.exports = {
-  loadCollection,
   whitelist : pick
 };
 
@@ -13,18 +12,4 @@ module.exports = {
 function pick ( obj, keys ) {
   return keys.map( k => k in obj ? { [ k ] : obj[ k ] } : {} )
       .reduce( ( res, o ) => Object.assign( res, o ), {} );
-}
-
-/**
- * @description A generic function to retrieve a LokiJs collection if exists, or create a new one if it doesn't
- * @param colName
- * @param db
- */
-function loadCollection(colName, db) {
-  return new Promise(resolve => {
-    db.loadDatabase({}, () => {
-      const _collection = db.getCollection(colName) || db.addCollection(colName);
-      return resolve(_collection);
-    })
-  })
 }
