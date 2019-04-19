@@ -6,7 +6,7 @@ const config = {
   logDir     		: process.env.LOGDIR || 'logs',
   viewEngine 		: process.env.VIEW_ENGINE || 'html',
   slackWebhookUrl 	: process.env.SLACK_WEBHOOK_URL,
-  slackChannel 		: process.env.SLACK_CHANNEL || '#test_smoke_signal',
+  slackChannel 		: process.env.SLACK_CHANNEL || '#test_smoke_signal_e',
   iconEmoji 			: process.env.ICON_URL || ':econ:',
   slackUsername		: process.env.SLACK_USERNAME || 'Hero'
 };

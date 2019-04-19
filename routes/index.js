@@ -1,5 +1,5 @@
-const cords          = require( "./cords" ),
-      uploads        = require( "./uploads" );
+const cords   = require( "./cords" );
+const uploads = require( "./uploads" );
 
 const routes = app => {
   app.use( ( req, res, next ) => {

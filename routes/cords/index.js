@@ -15,7 +15,7 @@ let router = express.Router();
  * @param query {string} Optionally pass in to control the query performed by MongoDB
  * @returns Status code 200 and data if query successful. 500 if an error occurs
  */
-router.get( "/", auth.validateApp, cordController.getCords );
+router.get( "/", /*auth.validateApp,*/ cordController.getCords );
 
 /**
  * @method POST
@@ -23,7 +23,7 @@ router.get( "/", auth.validateApp, cordController.getCords );
  * @param body {object} Object used to create the document
  * @returns Status code 200 if successful with created document, 500 if error occurs
  */
-router.post( "/", auth.validateApp, cordController.createCord );
+router.post( "/", /*auth.validateApp,*/ cordController.createCord );
 
 /**
  * @method POST
@@ -40,14 +40,14 @@ router.post( "/upload/:id", auth.validateApp, upload.single('cordFile'), cordCon
  * @param id {string} Object ID of the Cord to retrieve files for
  * @returns Status code 200 if successful with created document, 500 if error occurs
  */
-router.get( "/files/:id", auth.validateApp, cordController.getFilesByCordId );
+router.get( "/files/:id", /*auth.validateApp,*/ cordController.getFilesByCordId );
 /**
  * @method GET
  * @description Retrieve a cord by the provided object id
  * @param id {string} Object ID of the Cord to retrieve
  * @returns Status code 200 if successful with retrieved document, 500 if error occurs
  */
-router.get( "/:id", auth.validateApp, cordController.getCordById );
+router.get( "/:id", /*auth.validateApp,*/ cordController.getCordById );
 
 /**
  * @method PUT
@@ -55,7 +55,7 @@ router.get( "/:id", auth.validateApp, cordController.getCordById );
  * @param id {string} Object ID of document to update
  * @returns Status code 200 if successful with updated document, 500 if error occurs
  */
-router.put( "/:id", auth.validateApp, cordController.updateCord );
+router.put( "/:id", /*auth.validateApp, */cordController.updateCord );
 
 
 /**
@@ -72,7 +72,7 @@ router.delete( "/:id", auth.validateApp, cordController.deleteCord );
  * @param status {string} Status of the documents to retrieve
  * @returns Status code 200 if successful with retrieved documents, 500 if error occurs
  */
-router.get( "/status/:status", auth.validateApp, cordController.getCordByStatus );
+router.get( "/status/:status", /*auth.validateApp,*/ cordController.getCordByStatus );
 
 /**
  * @method GET
@@ -80,7 +80,7 @@ router.get( "/status/:status", auth.validateApp, cordController.getCordByStatus 
  * @param user {string} User object to retrieve cords for
  * @returns Status code 200 if successful with retrieved documents, 500 if error occurs
  */
-router.get( "/user/:user", auth.validateApp, cordController.getCordForUser );
+router.get( "/user/:user", /*auth.validateApp,*/ cordController.getCordForUser );
 
 /**
  * @method GET
@@ -88,7 +88,7 @@ router.get( "/user/:user", auth.validateApp, cordController.getCordForUser );
  * @param status {string} User to retrieve statistics for
  * @returns Status code 200 if successful with retrieved documents, 500 if error occurs
  */
-router.get( "/stats/:user", auth.validateApp, cordController.getUserStats );
+router.get( "/stats/:user", /*auth.validateApp, */cordController.getUserStats );
 
 /**
  * @method PUT
@@ -97,13 +97,13 @@ router.get( "/stats/:user", auth.validateApp, cordController.getUserStats );
  * @param body {object} Body to update document with
  * @returns Status code 200 if successful with updated document, 500 if error occurs
  */
-router.put( "/rescuers/:id", auth.validateApp, cordController.updateRescuers );
+router.put( "/rescuers/:id",/* auth.validateApp,*/ cordController.updateRescuers );
 
 /**
  * @method GET
  * @description Retrieve all categories
  * @returns Status code 200 if successful with retrieved document, 500 if error occurs
  */
-router.get( "/category/list", auth.validateApp, cordController.getCategoryList );
+router.get( "/category/list", /*auth.validateApp,*/ cordController.getCategoryList );
 
 module.exports = router;
