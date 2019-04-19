@@ -10,17 +10,11 @@ const logger = require( "../../config/logger" );
 // Todo: Remove all unused dependencies after refactor complete
 const path = require( "path" );
 const fs = require( "fs" );
-const loki = require( "lokijs" );
-const dbName = "db.json";
-const collectionName = "files";
 const uploadPath = "uploads";
-const db = new loki( `${uploadPath}/${dbName}`, { persistenceMethod: "fs" } );
-const config = require( "../../config" );
-const slack = ( config.slackWebhookUrl !== undefined ) ? require( "slack-notify" )( `${config.slackWebhookUrl}` ) : false;
-const slackNotificationUtil = require( "../../util/slackUtil" );
 
 // Create a usable instance of the Cord Service
 const CordServiceInstance = new CordService( Cords );
+const CategoryServiceInstance = new CordService( CategoryList );
 
 // Create a usable instance of the Slack Service
 const SlackServiceInstance = new SlackService();
@@ -67,26 +61,18 @@ async function getCords ( req, res ) {
 }
 
 // Todo: Refactor this to use Cord Service
-function getCategoryList ( req, res ) {
-  CategoryList
-    .find( {} )
-    .then( results => {
-      if ( !results.length ) {
-        results = [
-          { name: "Bug" },
-          { name: "Troubleshooting" },
-          { name: "Deployment" },
-          { name: "Others" }
-        ];
-      }
-      return res.send( resUtil.sendSuccess( results ) );
-    } )
-    .catch( err => {
-      return res.status( 500 ).send( resUtil.sendError( err ) );
-    } );
+async function getCategoryList ( req, res ) {
+  try {
+    const query = {};
+    const data = await CategoryServiceInstance.getCategoryList( query );
+    return res.send( resUtil.sendSuccess( data ) );
+  } catch ( err ) {
+    return res.status( 500 ).send( resUtil.sendError( err ) );
+  }
 }
 
 async function getCordById ( req, res ) {
+  // Todo: Refactor this into middleware
   const id = req.query.id || req.params.id || null;
 
   try {
@@ -150,7 +136,6 @@ async function getUserStats ( req, res ) {
   }
 }
 
-// Todo: create callback to send notification when cord created
 async function createCord ( req, res ) {
   if ( req.body ) {
     const body = objectUtil.whitelist( req.body, cordsKeyWhitelist );
@@ -187,6 +172,7 @@ async function updateCord ( req, res ) {
     "tags"
   ];
   if ( id && req.body ) {
+    // Todo: Refactor this into validator
     const body = objectUtil.whitelist( req.body, updateCordWhitelist );
     try {
       const data = await CordServiceInstance.update( id, body );
@@ -208,6 +194,7 @@ async function updateRescuers ( req, res ) {
   const updateCordWhitelist = [ "rescuers" ];
 
   if ( id && req.body && req.body.rescuers ) {
+    // Todo: Refactor this to be in validator
     const body = objectUtil.whitelist( req.body, updateCordWhitelist );
     const query = { $addToSet: { "rescuers": { $each: body.rescuers } } };
 
@@ -224,29 +211,17 @@ async function updateRescuers ( req, res ) {
   }
 }
 
-// Todo: refactor this to use Cord Service
 async function upload ( req, res ) {
-  const _id = req.query.id || req.params.id || null;
-  if ( _id ) {
+  const id = req.query.id || req.params.id || null;
+
+  // Todo: Refactor this to be in validator
+  if ( id && req.file ) {
+
     try {
-      const col = await objectUtil.loadCollection( collectionName, db );
-      const data = col.insert( req.file );
-
-      db.saveDatabase();
-      if ( data && data.filename ) {
-        Cords.findByIdAndUpdate( _id, { "files": data.filename }, { new: true } )
-          .then( response => {
-            return res.send( response );
-          } )
-          .catch( err => {
-            throw err;
-          } );
-      } else {
-        return res.status( 500 ).send( resUtil.sendError( "Error uploading file, please try again" ) );
-      }
-
+      const data = await CordServiceInstance.upload( id, req.file );
+      return res.send( resUtil.sendSuccess( data ) );
     } catch ( err ) {
-      return res.status( 400 ).send( resUtil.sendError( err ) );
+      return res.status( 500 ).send( resUtil.sendError( err ) );
     }
   } else {
     return res.status( 400 ).send( resUtil.sendError( "Invalid request: ID is required" ) );
@@ -259,7 +234,6 @@ async function getFilesByCordId ( req, res ) {
   if ( id ) {
     try {
       const projection = { files: 1 };
-
       const data = await CordServiceInstance.getFilesByCordId( id, projection );
 
       return res.send( resUtil.sendSuccess( data ) );
@@ -271,14 +245,12 @@ async function getFilesByCordId ( req, res ) {
   }
 }
 
-// Todo: Refactor this to use CordService
 async function getFile ( req, res ) {
   const fileName = req.query.id || req.params.id || null;
-  const col = await objectUtil.loadCollection( collectionName, db );
 
   if ( fileName ) {
     try {
-      const result = col.findOne( { "filename": fileName } );
+      const result = await CordService.getFile( fileName );
 
       if ( !result ) {
         return res.sendStatus( 404 );
