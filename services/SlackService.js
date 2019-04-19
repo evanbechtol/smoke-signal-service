@@ -27,7 +27,7 @@ class SlackService {
         app: body.app,
         description: body.description,
         category: body.category,
-        url: body.header( "Referer" )
+        url: body.header
       };
 
       const slackBody = SlackService.getTemplate( data );
