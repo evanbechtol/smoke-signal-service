@@ -95,12 +95,63 @@ class CordService {
   }
 
   /**
+   * @description Upload a file and associate it to a Cord
+   * @param id  {string} Mongoose Object ID for document
+   * @param file {object} File to upload
+   * @returns {Promise} Returns result of Mongoose query
+   */
+  async upload ( id, file ) {
+    const col = await ObjectUtil.loadCollection( collectionName, db );
+    const data = col.insert( file );
+
+    // Save the file to the database
+    db.saveDatabase();
+
+    // Todo: Check that data && data.filename are populated
+    const queryOptions = { lean: true, new: true };
+    const query = { files: data.filename };
+    return await this.mongooseServiceInstance.update( id, query, queryOptions );
+  }
+
+  /**
+   * @description Retrieve a file
+   * @param fileName {string} Filename to retrieve from DB
+   * @returns {Promise} Returns result of Mongoose query
+   */
+  static async getFile ( fileName ) {
+    const col = await ObjectUtil.loadCollection( collectionName, db );
+    return col.findOne( { "filename": fileName } );
+  }
+
+  /**
    * @description Delete a single cord document
    * @param id {string} Mongoose Object ID for document
    * @returns {Promise<any>} Returns result of Mongoose query
    */
   async delete ( id ) {
     return await this.mongooseServiceInstance.delete( id );
+  }
+
+  /**
+   * @description Retrieve Categories using query
+   * @param query {object} Required: Query to execute on Collection
+   * @returns {Promise}
+   */
+  async getCategoryList ( query ) {
+    const sort = { name: 1 };
+    const projection = { __v: 0 };
+    let data = await this.mongooseServiceInstance.find( query, projection, sort );
+
+    if ( !data.length ) {
+      data = [
+        { name: "Bug" },
+        { name: "Deployment" },
+        { name: "Other" },
+        { name: "Troubleshooting" }
+      ];
+    }
+
+    return data;
   }
 }
 
