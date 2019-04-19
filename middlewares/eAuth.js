@@ -1,19 +1,19 @@
-const config  = require( "../config" );
-const logger  = require( "../services/Logger" );
+const config = require( "../config" );
+const logger = require( "../services/Logger" );
 const resUtil = require( "../util/responseUtil" );
 const request = require( "request" );
 
 module.exports = { validateApp };
 
 function validateApp ( req, res, next ) {
-  let token      = ( req.headers && req.headers.authorization !== undefined ) ? req.headers.authorization.slice( 7 ) : req.query.appToken || req.params.appToken || req.body.appToken;
+  let token = ( req.headers && req.headers.authorization !== undefined ) ? req.headers.authorization.slice( 7 ) : req.query.appToken || req.params.appToken || req.body.appToken;
   const endpoint = "e_auth/validate/apps";
-  const url      = `${config.eAuthUrl}/${endpoint}?token=${token}`;
-  const options  = { auth : { bearer : token } };
+  const url = `${config.eAuthUrl}/${endpoint}?token=${token}`;
+  const options = { auth: { bearer: token } };
 
   if ( token ) {
     request.get( url, options, function ( err, response, body ) {
-      if (err) {
+      if ( err ) {
         return res.status( 500 ).send( resUtil.sendError( err ) );
       }
 
