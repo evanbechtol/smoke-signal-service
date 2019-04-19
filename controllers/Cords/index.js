@@ -4,13 +4,13 @@ const SlackService = require( "../../services/SlackService" );
 const CategoryList = require( "../../models/CategoryList/index.js" );
 const qUtil = require( "../../util/queryUtil" );
 const resUtil = require( "../../middlewares/responseMiddleware" );
-const objectUtil = require( "../../util" );
 const logger = require( "../../services/Logger" );
+const CordsWhitelist = require( "../../config/keysWhitelists/cords" );
 
 // Required for retrieving uploaded files
 const path = require( "path" );
 const fs = require( "fs" );
-const ObjectService = require( "../../util" );
+const ObjectService = require( "../../services/ObjectService" );
 const uploadPath = "uploads";
 
 // Create a usable instance of the Cord Service
@@ -19,20 +19,6 @@ const CategoryServiceInstance = new CordService( CategoryList );
 
 // Create a usable instance of the Slack Service
 const SlackServiceInstance = new SlackService();
-
-// Todo: Refactor this to be in file and in validator
-const cordsKeyWhitelist = [
-  "status",
-  "description",
-  "app",
-  "category",
-  "puller",
-  "rescuers",
-  "openedOn",
-  "title",
-  "likes",
-  "tags"
-];
 
 module.exports = {
   getCords,
@@ -139,7 +125,7 @@ async function getUserStats ( req, res ) {
 
 async function createCord ( req, res ) {
   if ( req.body ) {
-    const body = ObjectService.pick( req.body, cordsKeyWhitelist );
+    const body = ObjectService.pick( req.body, CordsWhitelist.post );
 
     try {
       const data = await CordServiceInstance.create( body );
@@ -160,21 +146,9 @@ async function createCord ( req, res ) {
 async function updateCord ( req, res ) {
   const id = req.query.id || req.params.id || null;
 
-  // Todo Refactor this to be in validator
-  const updateCordWhitelist = [
-    "status",
-    "description",
-    "discussion",
-    "app",
-    "category",
-    "rescuers",
-    "resolvedOn",
-    "title",
-    "tags"
-  ];
   if ( id && req.body ) {
     // Todo: Refactor this into validator
-    const body = ObjectService.pick( req.body, updateCordWhitelist );
+    const body = ObjectService.pick( req.body, CordsWhitelist.put );
     try {
       const data = await CordServiceInstance.update( id, body );
 
@@ -192,11 +166,9 @@ async function updateCord ( req, res ) {
 async function updateRescuers ( req, res ) {
   const id = req.query.id || req.params.id || null;
 
-  const updateCordWhitelist = [ "rescuers" ];
-
   if ( id && req.body && req.body.rescuers ) {
     // Todo: Refactor this to be in validator
-    const body = ObjectService.pick( req.body, updateCordWhitelist );
+    const body = ObjectService.pick( req.body, CordsWhitelist.rescuers );
     const query = { $addToSet: { "rescuers": { $each: body.rescuers } } };
 
     try {
