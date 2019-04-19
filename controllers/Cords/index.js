@@ -10,6 +10,7 @@ const logger = require( "../../services/Logger" );
 // Required for retrieving uploaded files
 const path = require( "path" );
 const fs = require( "fs" );
+const ObjectService = require( "../../util" );
 const uploadPath = "uploads";
 
 // Create a usable instance of the Cord Service
@@ -138,7 +139,7 @@ async function getUserStats ( req, res ) {
 
 async function createCord ( req, res ) {
   if ( req.body ) {
-    const body = objectUtil.whitelist( req.body, cordsKeyWhitelist );
+    const body = ObjectService.pick( req.body, cordsKeyWhitelist );
 
     try {
       const data = await CordServiceInstance.create( body );
@@ -173,7 +174,7 @@ async function updateCord ( req, res ) {
   ];
   if ( id && req.body ) {
     // Todo: Refactor this into validator
-    const body = objectUtil.whitelist( req.body, updateCordWhitelist );
+    const body = ObjectService.pick( req.body, updateCordWhitelist );
     try {
       const data = await CordServiceInstance.update( id, body );
 
@@ -195,7 +196,7 @@ async function updateRescuers ( req, res ) {
 
   if ( id && req.body && req.body.rescuers ) {
     // Todo: Refactor this to be in validator
-    const body = objectUtil.whitelist( req.body, updateCordWhitelist );
+    const body = ObjectService.pick( req.body, updateCordWhitelist );
     const query = { $addToSet: { "rescuers": { $each: body.rescuers } } };
 
     try {
