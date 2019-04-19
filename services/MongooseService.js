@@ -22,7 +22,7 @@ class MongooseService {
    * @returns {Promise} Returns the results of the query
    */
   create ( body ) {
-    return this.model.create( body ).exec();
+    return this.model.create( body );
   }
 
   /**
