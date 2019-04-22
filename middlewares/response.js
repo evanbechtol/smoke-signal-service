@@ -1,4 +1,3 @@
-// Todo: Refactor this into a middleware
 function sendError ( body ) {
   return { success: false, error: body };
 }

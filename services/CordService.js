@@ -33,7 +33,7 @@ class CordService {
    * @returns {Promise<any>} Returns result of Mongoose query
    */
   async find ( query, sort ) {
-    return await this.mongooseServiceInstance.find( query, sort );
+    return await this.mongooseServiceInstance.find( query, { __v: 0 }, sort );
   }
 
   /**
@@ -78,9 +78,9 @@ class CordService {
     ];
 
     return {
-      cordsPulledData: await this.mongooseServiceInstance.count( cordsPulledQuery ),
-      rescuesProvidedData: await this.mongooseServiceInstance.count( rescuesProvidedQuery ),
-      mostActiveAppData: await this.mongooseServiceInstance.aggregate( mostActiveAppPipeline )
+      cordsPulled: await this.mongooseServiceInstance.count( cordsPulledQuery ),
+      rescuesProvided: await this.mongooseServiceInstance.count( rescuesProvidedQuery ),
+      mostActiveApp: await this.mongooseServiceInstance.aggregate( mostActiveAppPipeline )
     };
   }
 
@@ -107,7 +107,6 @@ class CordService {
     // Save the file to the database
     db.saveDatabase();
 
-    // Todo: Check that data && data.filename are populated
     const queryOptions = { lean: true, new: true };
     const query = { files: data.filename };
     return await this.mongooseServiceInstance.update( id, query, queryOptions );
