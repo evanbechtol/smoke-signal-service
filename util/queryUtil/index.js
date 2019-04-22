@@ -16,6 +16,7 @@ function getDbQueryStrings ( queryString = {}) {
         query = JSON.parse( query );
       } catch ( e ) {
         logger.error( { error: e, query } );
+        throw new Error( e );
       }
   }
 

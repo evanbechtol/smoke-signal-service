@@ -6,6 +6,7 @@ const qUtil = require( "../../util/queryUtil" );
 const resUtil = require( "../../middlewares/response" );
 const logger = require( "../../services/Logger" );
 const CordsWhitelist = require( "../../config/keysWhitelists/cords" );
+const Sentry = require( "@sentry/node" );
 
 // Required for retrieving uploaded files
 const path = require( "path" );
@@ -22,30 +23,35 @@ const CategoryServiceInstance = new CordService( CategoryList );
 const SlackServiceInstance = new SlackService();
 
 module.exports = {
-  getCords,
+  createCord,
+  deleteCord,
+  getCategoryList,
   getCordById,
   getCordByStatus,
   getCordForUser,
+  getCords,
   getFile,
   getFilesByCordId,
   getUserStats,
-  createCord,
   updateCord,
   updateRescuers,
-  upload,
-  deleteCord,
-  getCategoryList
+  upload
 };
 
+Sentry.configureScope( scope => {
+  scope.setTag( "route", "cords" );
+} );
+
 async function getCords ( req, res ) {
-  const queryStrings = qUtil.getDbQueryStrings( req.query );
 
   try {
+    const queryStrings = qUtil.getDbQueryStrings( req.query );
     const data = await CordServiceInstance.find( queryStrings.query );
     return res.send( resUtil.sendSuccess( data ) );
   } catch ( err ) {
     logger.error( err );
-    return res.status( 500 ).send( resUtil.sendError( err ) );
+    res.status( 500 ).send( resUtil.sendError( err ) );
+    throw err;
   }
 }
 
@@ -56,7 +62,8 @@ async function getCategoryList ( req, res ) {
     return res.send( resUtil.sendSuccess( data ) );
   } catch ( err ) {
     logger.error( err );
-    return res.status( 500 ).send( resUtil.sendError( err ) );
+    res.status( 500 ).send( resUtil.sendError( err ) );
+    throw err;
   }
 }
 
@@ -66,7 +73,8 @@ async function getCordById ( req, res ) {
     return res.send( resUtil.sendSuccess( data ) );
   } catch ( err ) {
     logger.error( err );
-    return res.status( 500 ).send( resUtil.sendError( err ) );
+    res.status( 500 ).send( resUtil.sendError( err ) );
+    throw err;
   }
 }
 
@@ -78,7 +86,8 @@ async function getCordByStatus ( req, res ) {
     return res.send( resUtil.sendSuccess( data ) );
   } catch ( err ) {
     logger.error( err );
-    return res.status( 500 ).send( resUtil.sendError( err ) );
+    res.status( 500 ).send( resUtil.sendError( err ) );
+    throw err;
   }
 }
 
@@ -91,7 +100,8 @@ async function getCordForUser ( req, res ) {
     return res.send( resUtil.sendSuccess( data ) );
   } catch ( err ) {
     logger.error( err );
-    return res.status( 500 ).send( resUtil.sendError( err ) );
+    res.status( 500 ).send( resUtil.sendError( err ) );
+    throw err;
   }
 }
 
@@ -101,7 +111,8 @@ async function getUserStats ( req, res ) {
     return res.send( resUtil.sendSuccess( data ) );
   } catch ( err ) {
     logger.error( err );
-    return res.status( 500 ).send( resUtil.sendError( err ) );
+    res.status( 500 ).send( resUtil.sendError( err ) );
+    throw err;
   }
 }
 
@@ -117,23 +128,24 @@ async function createCord ( req, res ) {
     return res.send( resUtil.sendSuccess( data ) );
   } catch ( err ) {
     logger.error( err );
-    return res.status( 500 ).send( resUtil.sendError( err ) );
+    res.status( 500 ).send( resUtil.sendError( err ) );
+    throw err;
   }
 }
 
 async function updateCord ( req, res ) {
-  const id = req.query.id || req.params.id || null;
   const body = ObjectService.pick( req.body, CordsWhitelist.put );
 
   try {
-    const data = await CordServiceInstance.update( id, body );
+    const data = await CordServiceInstance.update( req.id, body );
 
     await SlackServiceInstance.sendNotification( req.body, false );
 
     return res.send( resUtil.sendSuccess( data ) );
   } catch ( err ) {
     logger.error( err );
-    return res.status( 500 ).send( resUtil.sendError( err ) );
+    res.status( 500 ).send( resUtil.sendError( err ) );
+    throw err;
   }
 }
 
@@ -149,7 +161,8 @@ async function updateRescuers ( req, res ) {
       return res.send( resUtil.sendSuccess( data ) );
     } catch ( err ) {
       logger.error( err );
-      return res.status( 500 ).send( resUtil.sendError( err ) );
+      res.status( 500 ).send( resUtil.sendError( err ) );
+      throw err;
     }
   } else {
     return res.status( 400 ).send( resUtil.sendError( Messages.responses.bodyNotProvided ) );
@@ -162,7 +175,8 @@ async function upload ( req, res ) {
     return res.send( resUtil.sendSuccess( data ) );
   } catch ( err ) {
     logger.error( err );
-    return res.status( 500 ).send( resUtil.sendError( err ) );
+    res.status( 500 ).send( resUtil.sendError( err ) );
+    throw err;
   }
 }
 
@@ -174,7 +188,8 @@ async function getFilesByCordId ( req, res ) {
     return res.send( resUtil.sendSuccess( data ) );
   } catch ( err ) {
     logger.error( err );
-    return res.status( 500 ).send( resUtil.sendError( err ) );
+    res.status( 500 ).send( resUtil.sendError( err ) );
+    throw err;
   }
 }
 
@@ -193,7 +208,8 @@ async function getFile ( req, res ) {
       fs.createReadStream( path.join( uploadPath, result.filename ) ).pipe( res );
     } catch ( err ) {
       logger.error( err );
-      return res.status( 500 ).send( resUtil.sendError( err ) );
+      res.status( 500 ).send( resUtil.sendError( err ) );
+      throw err;
     }
   } else {
     return res.status( 400 ).send( resUtil.sendError( Messages.responses.idNotProvided ) );
@@ -206,6 +222,7 @@ async function deleteCord ( req, res ) {
     return res.send( resUtil.sendSuccess( data ) );
   } catch ( err ) {
     logger.error( err );
-    return res.status( 500 ).send( resUtil.sendError( err ) );
+    res.status( 500 ).send( resUtil.sendError( err ) );
+    throw err;
   }
 }
