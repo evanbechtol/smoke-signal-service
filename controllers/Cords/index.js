@@ -43,15 +43,20 @@ Sentry.configureScope( scope => {
 } );
 
 async function getCords ( req, res ) {
+  const queryStrings = qUtil.getDbQueryStrings( req.query );
 
   try {
-    const queryStrings = qUtil.getDbQueryStrings( req.query );
     const data = await CordServiceInstance.find( queryStrings.query );
     return res.send( resUtil.sendSuccess( data ) );
   } catch ( err ) {
     logger.error( err );
     res.status( 500 ).send( resUtil.sendError( err ) );
-    throw err;
+
+    // Capture the error with user information provided
+    Sentry.withScope( scope => {
+      scope.setTag( "query", queryStrings.query );
+      Sentry.captureException( err );
+    } );
   }
 }
 
@@ -74,7 +79,12 @@ async function getCordById ( req, res ) {
   } catch ( err ) {
     logger.error( err );
     res.status( 500 ).send( resUtil.sendError( err ) );
-    throw err;
+
+    // Capture the error with user information provided
+    Sentry.withScope( scope => {
+      scope.setTag( "id", req.id );
+      Sentry.captureException( err );
+    } );
   }
 }
 
@@ -87,7 +97,12 @@ async function getCordByStatus ( req, res ) {
   } catch ( err ) {
     logger.error( err );
     res.status( 500 ).send( resUtil.sendError( err ) );
-    throw err;
+
+    // Capture the error with user information provided
+    Sentry.withScope( scope => {
+      scope.setTag( "status", req.status );
+      Sentry.captureException( err );
+    } );
   }
 }
 
@@ -101,7 +116,12 @@ async function getCordForUser ( req, res ) {
   } catch ( err ) {
     logger.error( err );
     res.status( 500 ).send( resUtil.sendError( err ) );
-    throw err;
+
+    // Capture the error with user information provided
+    Sentry.withScope( scope => {
+      scope.setUser( req.user );
+      Sentry.captureException( err );
+    } );
   }
 }
 
@@ -112,7 +132,12 @@ async function getUserStats ( req, res ) {
   } catch ( err ) {
     logger.error( err );
     res.status( 500 ).send( resUtil.sendError( err ) );
-    throw err;
+
+    // Capture the error with user information provided
+    Sentry.withScope( scope => {
+      scope.setUser( req.user );
+      Sentry.captureException( err );
+    } );
   }
 }
 
@@ -145,7 +170,12 @@ async function updateCord ( req, res ) {
   } catch ( err ) {
     logger.error( err );
     res.status( 500 ).send( resUtil.sendError( err ) );
-    throw err;
+
+    // Capture the error with user information provided
+    Sentry.withScope( scope => {
+      scope.setTag( "id", req.id );
+      Sentry.captureException( err );
+    } );
   }
 }
 
@@ -162,7 +192,12 @@ async function updateRescuers ( req, res ) {
     } catch ( err ) {
       logger.error( err );
       res.status( 500 ).send( resUtil.sendError( err ) );
-      throw err;
+
+      // Capture the error with user information provided
+      Sentry.withScope( scope => {
+        scope.setTag( "id", req.id );
+        Sentry.captureException( err );
+      } );
     }
   } else {
     return res.status( 400 ).send( resUtil.sendError( Messages.responses.bodyNotProvided ) );
@@ -176,7 +211,12 @@ async function upload ( req, res ) {
   } catch ( err ) {
     logger.error( err );
     res.status( 500 ).send( resUtil.sendError( err ) );
-    throw err;
+
+    // Capture the error with user information provided
+    Sentry.withScope( scope => {
+      scope.setTag( "id", req.id );
+      Sentry.captureException( err );
+    } );
   }
 }
 
@@ -189,7 +229,12 @@ async function getFilesByCordId ( req, res ) {
   } catch ( err ) {
     logger.error( err );
     res.status( 500 ).send( resUtil.sendError( err ) );
-    throw err;
+
+    // Capture the error with user information provided
+    Sentry.withScope( scope => {
+      scope.setTag( "id", req.id );
+      Sentry.captureException( err );
+    } );
   }
 }
 
@@ -223,6 +268,11 @@ async function deleteCord ( req, res ) {
   } catch ( err ) {
     logger.error( err );
     res.status( 500 ).send( resUtil.sendError( err ) );
-    throw err;
+
+    // Capture the error with user information provided
+    Sentry.withScope( scope => {
+      scope.setTag( "id", req.id );
+      Sentry.captureException( err );
+    } );
   }
 }
