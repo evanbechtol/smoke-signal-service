@@ -8,6 +8,10 @@ const bodyParser  = require( "body-parser" ),
       mongoose    = require( "mongoose" ),
       logger      = require( "./services/Logger" );
 
+// Todo: remove this when you can setup https
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+
+
 const mongooseOptions = {
   useCreateIndex  : true,
   useNewUrlParser : true,
