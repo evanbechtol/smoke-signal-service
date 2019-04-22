@@ -30,6 +30,8 @@ const mongooseOptions = {
 };
 
 mongoose.Promise = global.Promise;
+
+// Connect to the DB an initialize the app if successful
 mongoose.connect( config.dbUrl, mongooseOptions )
   .then( () => {
     logger.info( "Database connection successful" );
