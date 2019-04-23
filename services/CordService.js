@@ -18,6 +18,22 @@ class CordService {
   }
 
   /**
+   * @description Retrieve the cordModel for the instance
+   * @returns {mongoose.model}
+   */
+  getCordModel () {
+    return this.cordModel;
+  }
+
+  /**
+   * @description Retrieve the mongooseServiceInstance for the instance
+   * @returns {MongooseService}
+   */
+  getMongooseServiceInstance () {
+    return this.mongooseServiceInstance;
+  }
+
+  /**
    * @description Create a single new cord document
    * @param cord {object} Required: Data to populate cord with
    * @returns {Promise<any>} Returns result of Mongoose query
