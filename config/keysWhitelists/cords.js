@@ -1,26 +1,42 @@
 module.exports = {
-  post: [
-    "status",
-    "description",
+  get: [
+    "_id",
     "app",
     "category",
-    "puller",
-    "rescuers",
-    "openedOn",
-    "title",
-    "likes",
-    "tags"
-  ],
-  put: [
-    "status",
     "description",
     "discussion",
+    "files",
+    "likes",
+    "openedOn",
+    "puller",
+    "rescuers",
+    "status",
+    "tags",
+    "title"
+  ],
+
+  post: [
     "app",
     "category",
+    "description",
+    "likes",
+    "openedOn",
+    "puller",
+    "rescuers",
+    "status",
+    "tags",
+    "title"
+  ],
+  put: [
+    "app",
+    "category",
+    "description",
+    "discussion",
     "rescuers",
     "resolvedOn",
-    "title",
-    "tags"
+    "status",
+    "tags",
+    "title"
   ],
   rescuers: [ "rescuers" ]
 };
