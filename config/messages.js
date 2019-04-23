@@ -1,9 +1,11 @@
 module.exports = {
-  400 : "",
-  403 : "",
-  404 : "",
-  500 : "",
+  400: "",
+  403: "",
+  404: "",
+  500: "",
   responses: {
+    appTokenNotProvided: "appToken must be included in" +
+      " querystring/params/body for request",
     errorParsingObject: "Invalid JSON object provided",
     fileNotProvided: "Valid file not provided",
     idNotProvided: "Valid request ID not provided",

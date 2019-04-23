@@ -1,5 +1,6 @@
 const express = require( "express" );
 const auth = require( "../../middlewares/eAuth" );
+const token = require( "../../middlewares/token" );
 const CordController = require( "../../controllers/Cords" );
 const CordValidator = require( "../../middlewares/validators/Cords" );
 const Multer = require( "multer" );
@@ -17,7 +18,11 @@ const router = express.Router();
  * @returns Status code 200 and data if query successful. 500 if an error
  *   occurs
  */
-router.get( "/", /*auth.validateApp,*/ CordController.getCords );
+router.get( "/",
+  token.validateToken,
+  auth.validateApp,
+  CordController.getCords
+);
 
 /**
  * @method POST
@@ -28,6 +33,7 @@ router.get( "/", /*auth.validateApp,*/ CordController.getCords );
  */
 router.post( "/",
   CordValidator.bodyIsPresent,
+  token.validateToken,
   auth.validateApp,
   CordController.createCord
 );
@@ -41,7 +47,8 @@ router.post( "/",
  */
 router.post( "/upload/:id",
   CordValidator.idIsPresent,
-  /*auth.validateApp, */
+  token.validateToken,
+  auth.validateApp,
   upload.single( "cordFile" ),
   CordValidator.fileIsPresent,
   CordController.upload
@@ -57,6 +64,7 @@ router.post( "/upload/:id",
  */
 router.get( "/files/:id",
   CordValidator.idIsPresent,
+  token.validateToken,
   auth.validateApp,
   CordController.getFilesByCordId
 );
@@ -69,6 +77,7 @@ router.get( "/files/:id",
  */
 router.get( "/:id",
   CordValidator.idIsPresent,
+  token.validateToken,
   auth.validateApp,
   CordController.getCordById
 );
@@ -83,7 +92,8 @@ router.get( "/:id",
 router.put( "/:id",
   CordValidator.idIsPresent,
   CordValidator.bodyIsPresent,
-  /*auth.validateApp, */
+  token.validateToken,
+  auth.validateApp,
   CordController.updateCord
 );
 
@@ -97,6 +107,7 @@ router.put( "/:id",
  */
 router.delete( "/:id",
   CordValidator.idIsPresent,
+  token.validateToken,
   auth.validateApp,
   CordController.deleteCord
 );
@@ -110,6 +121,7 @@ router.delete( "/:id",
  */
 router.get( "/status/:status",
   CordValidator.statusIsPresent,
+  token.validateToken,
   auth.validateApp,
   CordController.getCordByStatus
 );
@@ -123,6 +135,7 @@ router.get( "/status/:status",
  */
 router.get( "/user/:user",
   CordValidator.userIsPresent,
+  token.validateToken,
   auth.validateApp,
   CordController.getCordForUser
 );
@@ -136,6 +149,7 @@ router.get( "/user/:user",
  */
 router.get( "/stats/:user",
   CordValidator.userIsPresent,
+  token.validateToken,
   auth.validateApp,
   CordController.getUserStats
 );
@@ -152,7 +166,8 @@ router.get( "/stats/:user",
 router.put( "/rescuers/:id",
   CordValidator.idIsPresent,
   CordValidator.bodyIsPresent,
-  /* auth.validateApp,*/
+  token.validateToken,
+  auth.validateApp,
   CordController.updateRescuers
 );
 
@@ -162,6 +177,10 @@ router.put( "/rescuers/:id",
  * @returns Status code 200 if successful with retrieved document, 500 if error
  *   occurs
  */
-router.get( "/category/list", auth.validateApp, CordController.getCategoryList );
+router.get( "/category/list",
+  token.validateToken,
+  auth.validateApp,
+  CordController.getCategoryList
+);
 
 module.exports = router;
