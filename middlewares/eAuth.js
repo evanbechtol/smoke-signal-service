@@ -5,6 +5,13 @@ const request = require( "request" );
 
 module.exports = { validateApp };
 
+/**
+ * @description Validates that the application token provided is valid with
+ * E-Auth
+ * @param req {object} Express object
+ * @param res {object} Express object
+ * @param next {function} Express next MW
+ */
 function validateApp ( req, res, next ) {
   const endpoint = "e_auth/validate/apps";
   const url = `${config.eAuthUrl}/${endpoint}?token=${req.token}`;
