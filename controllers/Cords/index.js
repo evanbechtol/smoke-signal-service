@@ -42,6 +42,13 @@ Sentry.configureScope( scope => {
   scope.setTag( "route", "cords" );
 } );
 
+/**
+ * @description Retrieve one or many cords. Accepts an optional JSON query
+ * to be performed on the Mongo Collection
+ * @param req
+ * @param res
+ * @returns {Promise<*>}
+ */
 async function getCords ( req, res ) {
   const queryStrings = qUtil.getDbQueryStrings( req.query );
 
@@ -60,6 +67,12 @@ async function getCords ( req, res ) {
   }
 }
 
+/**
+ * @description Retrieve items from the Category Collection
+ * @param req
+ * @param res
+ * @returns {Promise<*>}
+ */
 async function getCategoryList ( req, res ) {
   try {
     const query = {};
@@ -72,6 +85,12 @@ async function getCategoryList ( req, res ) {
   }
 }
 
+/**
+ * @description Retrieve a single cord by the Object ID
+ * @param req
+ * @param res
+ * @returns {Promise<*>}
+ */
 async function getCordById ( req, res ) {
   try {
     const data = await CordServiceInstance.findById( req.id );
@@ -88,6 +107,12 @@ async function getCordById ( req, res ) {
   }
 }
 
+/**
+ * @description Retrieve one or many cords by their status
+ * @param req
+ * @param res
+ * @returns {Promise<*>}
+ */
 async function getCordByStatus ( req, res ) {
   const query = { status: req.status };
 
@@ -106,6 +131,13 @@ async function getCordByStatus ( req, res ) {
   }
 }
 
+/**
+ * @description Retrieve cords by their status and by the user who pulled
+ * the cord
+ * @param req
+ * @param res
+ * @returns {Promise<*>}
+ */
 async function getCordForUser ( req, res ) {
   const status = req.query.status || req.params.status || "Open";
   const query = { puller: req.user, status };
@@ -125,6 +157,12 @@ async function getCordForUser ( req, res ) {
   }
 }
 
+/**
+ * @description Retrieve user statistics for cord related data
+ * @param req
+ * @param res
+ * @returns {Promise<*>}
+ */
 async function getUserStats ( req, res ) {
   try {
     const data = await CordServiceInstance.getUserStats( req.user );
@@ -141,6 +179,12 @@ async function getUserStats ( req, res ) {
   }
 }
 
+/**
+ * @description Create a cord with the provided body
+ * @param req
+ * @param res
+ * @returns {Promise<*>}
+ */
 async function createCord ( req, res ) {
   const body = ObjectService.pick( req.body, CordsWhitelist.post );
 
@@ -158,6 +202,13 @@ async function createCord ( req, res ) {
   }
 }
 
+/**
+ * @description Update a cord with the provided by, matching the provided
+ * Object ID
+ * @param req
+ * @param res
+ * @returns {Promise<*>}
+ */
 async function updateCord ( req, res ) {
   const body = ObjectService.pick( req.body, CordsWhitelist.put );
 
@@ -179,6 +230,12 @@ async function updateCord ( req, res ) {
   }
 }
 
+/**
+ * @description Update the rescuers on the cord matching the provided Object ID
+ * @param req
+ * @param res
+ * @returns {Promise<*>}
+ */
 async function updateRescuers ( req, res ) {
 
   if ( req.body.rescuers ) {
