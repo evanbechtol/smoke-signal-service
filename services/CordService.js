@@ -36,17 +36,28 @@ class CordService {
   /**
    * @description Create a single new cord document
    * @param cord {object} Required: Data to populate cord with
-   * @returns {Promise<any>} Returns result of Mongoose query
+   * @returns {Promise} Returns result of Mongoose query
    */
   async create ( cord ) {
     return await this.mongooseServiceInstance.create( cord );
   }
 
   /**
+   * @description Retrieve list of distinct values for the field, in
+   * documents returned form the provided query
+   * @param query {object} Required: Query to execute on the Collection
+   * @param field {string} The field to retrieve distinct values for
+   * @returns {Promise}
+   */
+  async findDistinct ( query, field ) {
+    return await this.mongooseServiceInstance.findDistinct( query, field );
+  }
+
+  /**
    * @description Get multiple documents by ID
    * @param query {object} Required: Query to execute on Model
    * @param {object} [sort] Optional: argument to sort data
-   * @returns {Promise<any>} Returns result of Mongoose query
+   * @returns {Promise} Returns result of Mongoose query
    */
   async find ( query, sort ) {
     return await this.mongooseServiceInstance.find( query, { __v: 0 }, sort );
@@ -59,6 +70,16 @@ class CordService {
    */
   async findById ( id ) {
     return await this.mongooseServiceInstance.findById( id );
+  }
+
+  /**
+   * @description Retrieve a single document by query
+   * @param query {object} Required: Mongoose query object
+   * @param  projection [object] Optional: Mongoose query object
+   * @returns {Promise<void>}
+   */
+  async findOne ( query, projection = { __v: 0 } ) {
+    return await this.mongooseServiceInstance.findOne( query, projection );
   }
 
   /**
