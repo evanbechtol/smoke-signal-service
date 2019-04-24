@@ -41,19 +41,12 @@ class ExpressLoader {
 
     this.server = https.createServer( expressOptions, app ).listen( 443, () => {
       logger.info( `Express running, now listening on port ${config.port}` );
+      console.log( `Express running, now listening on port ${config.port}` );
       Sentry.withScope( ( scope ) => {
         scope.setLevel( "info" );
         Sentry.captureMessage( `Service running on port ${config.port}` );
       } );
     } );
-
-    /*this.server = app.listen( config.port, () => {
-      logger.info( `Express running, now listening on port ${config.port}` );
-      Sentry.withScope( ( scope ) => {
-        scope.setLevel( "info" );
-        Sentry.captureMessage( `Service running on port ${config.port}` );
-      } );
-     } );*/
   }
 
   getServer () {
