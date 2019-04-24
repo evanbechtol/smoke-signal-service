@@ -5,6 +5,7 @@ const dbName = "db.json";
 const collectionName = "files";
 const uploadPath = "uploads";
 const db = new loki( `${uploadPath}/${dbName}`, { persistenceMethod: "fs" } );
+const ObjectId = require( "mongoose" ).Types.ObjectId;
 
 class CordService {
   /**
@@ -105,20 +106,24 @@ class CordService {
    * @returns {object} Returns results of Mongoose query
    */
   async getUserStats ( user ) {
-    const cordsPulledQuery = { puller: user };
-    const rescuesProvidedQuery = { rescuers: user };
-    const mostActiveAppPipeline = [
-      { $match: cordsPulledQuery },
-      { $group: { _id: "$app", count: { $sum: 1 } } },
-      { $sort: { count: -1 } },
-      { $limit: 1 }
-    ];
+    if ( user && user.hasOwnProperty( "_id" ) && user.hasOwnProperty( "username" ) ) {
+      const cordsPulledQuery = { puller: user };
+      const rescuesProvidedQuery = { rescuers: user };
+      const mostActiveAppPipeline = [
+        { $match: cordsPulledQuery },
+        { $group: { _id: "$app", count: { $sum: 1 } } },
+        { $sort: { count: -1 } },
+        { $limit: 1 }
+      ];
 
-    return {
-      cordsPulled: await this.mongooseServiceInstance.count( cordsPulledQuery ),
-      rescuesProvided: await this.mongooseServiceInstance.count( rescuesProvidedQuery ),
-      mostActiveApp: await this.mongooseServiceInstance.aggregate( mostActiveAppPipeline )
-    };
+      return {
+        cordsPulled: await this.mongooseServiceInstance.count( cordsPulledQuery ),
+        rescuesProvided: await this.mongooseServiceInstance.count( rescuesProvidedQuery ),
+        mostActiveApp: await this.mongooseServiceInstance.aggregate( mostActiveAppPipeline )
+      };
+    } else {
+      throw new Error( "Invalid User" );
+    }
   }
 
   /**
@@ -128,7 +133,13 @@ class CordService {
    * @returns {Promise<any>} Returns result of Mongoose query
    */
   async update ( id, cord ) {
-    return await this.mongooseServiceInstance.update( id, cord );
+    const isValidId = id && ObjectId.isValid( id );
+    const isValidBody = cord && typeof cord === "object";
+    if ( isValidId && isValidBody ) {
+      return await this.mongooseServiceInstance.update( id, cord );
+    } else {
+      throw new Error( "Invalid ID or body provided" );
+    }
   }
 
   /**
