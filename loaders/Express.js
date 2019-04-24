@@ -7,6 +7,8 @@ const routes = require( "../routes" );
 const compression = require( "compression" );
 const logger = require( "../services/Logger" );
 const config = require( "../config" );
+const https = require( "https" );
+const fs = require( "fs" );
 
 class ExpressLoader {
   constructor () {
@@ -32,13 +34,26 @@ class ExpressLoader {
 
 
     // Start application
-    this.server = app.listen( config.port, () => {
+    const expressOptions = {
+      key: fs.readFileSync( config.key ),
+      cert: fs.readFileSync( config.cert )
+    };
+
+    this.server = https.createServer( expressOptions, app ).listen( 443, () => {
       logger.info( `Express running, now listening on port ${config.port}` );
       Sentry.withScope( ( scope ) => {
         scope.setLevel( "info" );
         Sentry.captureMessage( `Service running on port ${config.port}` );
       } );
     } );
+
+    /*this.server = app.listen( config.port, () => {
+      logger.info( `Express running, now listening on port ${config.port}` );
+      Sentry.withScope( ( scope ) => {
+        scope.setLevel( "info" );
+        Sentry.captureMessage( `Service running on port ${config.port}` );
+      } );
+     } );*/
   }
 
   getServer () {

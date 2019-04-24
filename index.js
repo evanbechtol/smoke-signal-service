@@ -3,9 +3,6 @@ const mongoose = require( "mongoose" );
 const logger = require( "./services/Logger" );
 const Sentry = require( "@sentry/node" );
 
-// Todo: remove this when you can setup https
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-
 Sentry.init( {
   dsn: config.sentryDsn,
   environment: process.env.NODE_ENV || "development",

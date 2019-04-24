@@ -10,7 +10,9 @@ const config = {
   iconEmoji: process.env.ICON_URL || ":econ:",
   slackUsername: process.env.SLACK_USERNAME || "Hero",
   release: process.env.RELEASE || "1.0.0",
-  sentryDsn: process.env.SENTRYDSN
+  sentryDsn: process.env.SENTRYDSN,
+  key: process.env.KEY,
+  cert: process.env.CERT
 };
 
 module.exports = config;
