@@ -39,7 +39,7 @@ class ExpressLoader {
       cert: fs.readFileSync( config.cert )
     };
 
-    this.server = https.createServer( expressOptions, app ).listen( 443, () => {
+    this.server = https.createServer( expressOptions, app ).listen( config.port, () => {
       logger.info( `Express running, now listening on port ${config.port}` );
       Sentry.withScope( ( scope ) => {
         scope.setLevel( "info" );
