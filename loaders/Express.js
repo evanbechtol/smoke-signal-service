@@ -12,8 +12,6 @@ class ExpressLoader {
   constructor () {
     const app = express();
 
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-
     // Setup error handling, this must be after all other middleware
     app.use( ExpressLoader.errorHandler );
 
@@ -31,7 +29,6 @@ class ExpressLoader {
 
     // Pass app to routes
     routes( app );
-
 
     // Start application
     this.server = app.listen( config.port, () => {
