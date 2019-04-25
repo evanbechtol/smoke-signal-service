@@ -12,6 +12,8 @@ class ExpressLoader {
   constructor () {
     const app = express();
 
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+
     // Setup error handling, this must be after all other middleware
     app.use( ExpressLoader.errorHandler );
 
