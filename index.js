@@ -3,22 +3,10 @@ const mongoose = require( "mongoose" );
 const logger = require( "./services/Logger" );
 const Sentry = require( "@sentry/node" );
 
-Sentry.init( {
-  dsn: config.sentryDsn,
-  environment: process.env.NODE_ENV || "development",
-  release: config.release
-} );
-
-Sentry.configureScope( scope => {
-  //eslint-disable-next-line
-  scope.addEventProcessor( ( event, hint ) => {
-    // Add anything to the event here
-    // returning null will drop the event
-    logger.info( `Sentry event logged: ${JSON.stringify( event )}` );
-    return event;
-  } );
-} );
-
+// Initialize Sentry
+const SentryLoader = require( "./loaders/Sentry" );
+const SentryInstance = new SentryLoader( config.sentryDsn, config.env, config.release );
+SentryInstance.init();
 
 const mongooseOptions = {
   useCreateIndex: true,
