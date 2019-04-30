@@ -9,7 +9,8 @@ let router = express.Router();
  * @description Retrieve cords (paginated by default to 10 items per page)
  * @param limit {number} Optionally pass in to adjust page size
  * @param skip {number} Optionally pass in to control item offset for page
- * @param query {string} Optionally pass in to control the query performed by MonogDB
+ * @param query {string} Optionally pass in to control the query performed
+ * by MongoDB
  * @returns Status code 200 and data if query successful. 500 if an error occurs
  */
 router.get( "/:id", auth.validateApp, cordController.getFile );

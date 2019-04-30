@@ -46,26 +46,28 @@ mocha.describe( "Cords Service", () => {
   const CordServiceInstance = new CordService( Cords );
 
   mocha.describe( "Create instance of service", () => {
-    it( "Should expose the cordModel via a method", () => {
+    it( "Exposes the cordModel via a method", () => {
       assert.isFunction( CordServiceInstance.getCordModel );
     } );
 
-    it( "Model should be populated", () => {
+    it( "Model is populated", () => {
       assert.exists( CordServiceInstance.getCordModel() );
     } );
 
-    it( "Should expose the mongooseInstance via a method", () => {
+    it( "Exposes the mongooseInstance via a method", () => {
       assert.isFunction( CordServiceInstance.getMongooseServiceInstance );
     } );
 
-    it( "Mongoose instance should be populated", () => {
+    it( "Mongoose instance is populated", () => {
       assert.exists( CordServiceInstance.getMongooseServiceInstance() );
     } );
   } );
 
   mocha.describe( "Create a document", () => {
     context( "When proper body provided", () => {
-      it( "Should create a document", async () => {
+      let createdDoc;
+
+      it( "Creates a document and returns it", async () => {
         const newCord = {
           app: "Knowledge Catalog",
           category: "Authentication",
@@ -77,18 +79,26 @@ mocha.describe( "Cords Service", () => {
           title: "500 Status code on login"
         };
 
-        const result = await CordServiceInstance.create( newCord );
+        createdDoc = await CordServiceInstance.create( newCord );
 
-        assert.exists( result );
-        assert.isObject( result );
-        assert.containsAllKeys( result._doc, CordsWhitelists.get );
+        assert.exists( createdDoc );
+        cordToRetrieve = createdDoc._doc;
+      } );
 
-        cordToRetrieve = result._doc;
+      it( "Is an object", () => {
+        assert.isObject( createdDoc );
+      } );
+
+      it( "Has all required keys", () => {
+        assert.containsAllKeys( createdDoc._doc, CordsWhitelists.get );
+        cordToRetrieve = createdDoc._doc;
       } );
     } );
 
     context( "When proper body not provided", () => {
-      it( "Should throw an error", async () => {
+      let error;
+
+      it( "Throws an error", async () => {
         const newCord = {
           description: "Here is a test description from the DB",
           openedOn: "2019-02-19T20:57:00.009Z",
@@ -99,55 +109,117 @@ mocha.describe( "Cords Service", () => {
           await CordServiceInstance.create( newCord );
         } catch ( e ) {
           assert.exists( e );
-          assert.isObject( e );
-          assert.strictEqual( e.name, "ValidationError" );
+          error = e;
         }
+      } );
+
+      it( "Is an object", () => {
+        assert.isObject( error );
+      } );
+
+      it( "Should have a name property", () => {
+        assert.exists( error.name );
+      } );
+
+      it( "Name is 'ValidationError'", () => {
+        assert.strictEqual( error.name, "ValidationError" );
       } );
     } );
   } );
 
   mocha.describe( "Find documents", () => {
-    mocha.describe( "With Query", () => {
-      it( "One or more documents", async () => {
-        const query = { status: "Open" };
-        const result = await CordServiceInstance.find( query );
 
-        assert.exists( result );
-        assert.isAtLeast( result.length, 1 );
-        assert.isObject( result[ 0 ] );
-        assert.containsAllKeys( result[ 0 ], CordsWhitelists.get );
+    mocha.describe( "With Query", () => {
+
+      context( "Find one or more documents", () => {
+        let result;
+
+        it( "Retrieves at least one document", async () => {
+          const query = { status: "Open" };
+          result = await CordServiceInstance.find( query );
+
+          assert.exists( result );
+        } );
+
+        it( "Has length of at least 1", () => {
+          assert.isAtLeast( result.length, 1 );
+        } );
+
+        it( "Is an object", () => {
+          assert.isObject( result[ 0 ] );
+        } );
+
+        it( "Has all required keys", () => {
+          assert.containsAllKeys( result[ 0 ], CordsWhitelists.get );
+        } );
       } );
 
-      it( "Single document", async () => {
-        const query = { status: "Open" };
-        const result = await CordServiceInstance.findOne( query );
+      context( "Find one document", () => {
+        let result;
 
-        assert.exists( result );
-        assert.isObject( result );
-        assert.deepEqual( result._id, cordToRetrieve._id );
-        assert.containsAllKeys( result, CordsWhitelists.get );
+        it( "Retrieves a single document", async () => {
+          const query = { status: "Open" };
+          result = await CordServiceInstance.findOne( query );
+
+          assert.exists( result );
+        } );
+
+        it( "Is an object", () => {
+          assert.isObject( result );
+        } );
+
+        it( "Is identical to created document", () => {
+          assert.deepEqual( result._id, cordToRetrieve._id );
+        } );
+
+        it( "Has all required keys", () => {
+          assert.containsAllKeys( result, CordsWhitelists.get );
+        } );
       } );
     } );
 
-    mocha.describe( "By ID", () => {
+    mocha.describe( "With ID", () => {
       context( "When valid ID provided", () => {
-        it( "Should find a single document by ID", async () => {
-          const result = await CordServiceInstance.findById( cordToRetrieve._id );
+        let result;
+
+        it( "Retrieves a single document by ID", async () => {
+          result = await CordServiceInstance.findById( cordToRetrieve._id );
 
           assert.exists( result );
+        } );
+
+        it( "Is an object", () => {
+          assert.isObject( result );
+        } );
+
+        it( "Has all required keys", () => {
           assert.containsAllKeys( result, CordsWhitelists.get );
         } );
       } );
 
       context( "When invalid ID provided", () => {
-        it( "Should throw an error", async () => {
+        let error;
+
+        it( "Throws an error", async () => {
           const _id = "";
           try {
             await CordServiceInstance.findById( _id );
           } catch ( e ) {
-            assert.exists( e );
-            assert.isObject( e );
+            error = e;
+            assert.exists( error );
           }
+        } );
+
+        it( "Is an object", () => {
+          assert.isObject( error );
+        } );
+
+        it( "Has a name property", () => {
+          assert.property( error, "name" );
+        } );
+
+        it( "Name is 'CastError'", () => {
+          assert.strictEqual( error.name, "CastError" );
         } );
       } );
     } );
@@ -155,76 +227,141 @@ mocha.describe( "Cords Service", () => {
 
   mocha.describe( "Update a document", () => {
     context( "When valid ID provided", () => {
+      let result;
+      const tags = [ "testing", "update2" ];
+
       it( "Should update a document", async () => {
-        const tags = [ "testing", "update2" ];
         const updateData = { tags };
-        const result = await CordServiceInstance.update( cordToRetrieve._id, updateData );
+        result = await CordServiceInstance.update( cordToRetrieve._id, updateData );
 
         assert.exists( result );
+      } );
+
+      it( "Is an object", () => {
         assert.isObject( result );
+      } );
+
+      it( "Has all required keys", () => {
+        assert.containsAllKeys( result, CordsWhitelists.get );
+      } );
+
+      it( "Tags property is an array", () => {
         assert.isArray( result.tags );
+      } );
+
+      it( "Contains tags that were inserted", () => {
         assert.deepEqual( result.tags, tags );
       } );
     } );
 
     context( "When invalid ID provided", () => {
-      it( "Should throw an error", async () => {
-        const tags = [ "testing", "update2" ];
+      let error;
+      const tags = [ "testing", "update2" ];
+
+      it( "Throws an error", async () => {
         const updateData = { tags };
+
         try {
           await CordServiceInstance.update( "", updateData );
         } catch ( e ) {
           assert.exists( e );
-          assert.strictEqual( e.message, "Invalid ID or body provided" );
+
+          error = e;
         }
+      } );
+
+      it( "Is an object", () => {
+        assert.strictEqual( typeof error, "object" );
+      } );
+
+      it( "Has a message property", () => {
+        assert.exists( error.message );
+      } );
+
+      it( "Has message 'Invalid ID or body provided'", () => {
+        assert.strictEqual( error.message, "Invalid ID or body provided" );
       } );
     } );
   } );
 
   mocha.describe( "User stats", () => {
     context( "When valid user provided", () => {
-      it( "Should get user stats", async () => {
-        const expectedKeys = [ "cordsPulled", "rescuesProvided", "mostActiveApp" ];
-        const result = await CordServiceInstance.getUserStats( cordToRetrieve.puller );
+      let result;
+
+      it( "Retrieves user stats", async () => {
+        result = await CordServiceInstance.getUserStats( cordToRetrieve.puller );
 
         assert.exists( result );
+      } );
+
+      it( "Is an object", () => {
         assert.isObject( result );
+      } );
+
+      it( "Has all required keys", () => {
+        const expectedKeys = [ "cordsPulled", "rescuesProvided", "mostActiveApp" ];
         assert.containsAllKeys( result, expectedKeys );
       } );
     } );
 
     context( "When invalid user provided", () => {
-      it( "Should throw an error", async () => {
+      let error;
+
+      it( "Throws an error", async () => {
         try {
           const query = {};
           await CordServiceInstance.getUserStats( query );
         } catch ( e ) {
           assert.exists( e );
-          assert.strictEqual( e.message, "Invalid User" );
+          error = e;
         }
+      } );
+
+      it( "Is an object", () => {
+        assert.strictEqual( typeof error, "object" );
+      } );
+
+      it( "Has a message of 'Invalid User'", () => {
+        assert.strictEqual( error.message, "Invalid User" );
       } );
     } );
   } );
 
   mocha.describe( "Distinct fields", () => {
     context( "When valid field provided", () => {
-      it( "Should retrieve distinct fields", async () => {
+      let result;
+
+      it( "Retrieves distinct fields", async () => {
         const query = { status: "Open" };
-        const result = await CordServiceInstance.findDistinct( query, "category" );
+        result = await CordServiceInstance.findDistinct( query, "category" );
 
         assert.exists( result );
+      } );
+
+      it( "Is an array", () => {
         assert.isArray( result );
+      } );
+
+      it( "Has a length of at least 1", () => {
         assert.isAtLeast( result.length, 1 );
       } );
     } );
 
     context( "When invalid field provided", () => {
-      it( "Should be empty", async () => {
+      let result;
+
+      it( "Retrieves empty array", async () => {
         const query = { status: "Open" };
-        const result = await CordServiceInstance.findDistinct( query, "someBadField" );
+        result = await CordServiceInstance.findDistinct( query, "someBadField" );
 
         assert.exists( result );
+      } );
+
+      it( "Is an array", () => {
         assert.isArray( result );
+      } );
+
+      it( "Has a length of 0", () => {
         assert.lengthOf( result, 0 );
       } );
     } );
@@ -233,50 +370,99 @@ mocha.describe( "Cords Service", () => {
   mocha.describe( "Files", () => {
     mocha.describe( "Upload", () => {
       context( "When valid file object provided", () => {
-        it( "Should upload a file", async () => {
+        let result;
+
+        it( "Uploads a file", async () => {
           const fakeFileData = { filename: "1a2b3c4d5e" };
-          const result = await CordServiceInstance.upload( cordToRetrieve._id, fakeFileData );
+          result = await CordServiceInstance.upload( cordToRetrieve._id, fakeFileData );
 
           assert.exists( result );
-          assert.isObject( result );
-          assert.exists( result.files );
-          assert.isAtLeast( result.files.length, 1 );
 
           // Update the cord we are holding onto
           cordToRetrieve = result;
         } );
+
+        it( "Is an object", () => {
+          assert.isObject( result );
+        } );
+
+        it( "Has a files property", () => {
+          assert.exists( result.files );
+        } );
+
+        it( "Files property is a string", () => {
+          assert.isString( result.files );
+        } );
+
+        it( "Files has a length of at least 1", () => {
+          assert.isAtLeast( result.files.length, 1 );
+        } );
       } );
 
       context( "When invalid file object provided", () => {
-        it( "Should throw an error", async () => {
+        let error;
+
+        it( "Throws an error", async () => {
           const fakeFileData = "1a2b3c4d5e";
           try {
             await CordServiceInstance.upload( cordToRetrieve._id, fakeFileData );
           } catch ( e ) {
             assert.exists( e );
-            assert.strictEqual( e.message, "Document needs to be an object" );
+            error = e;
           }
+        } );
+
+        it( "Is an object", () => {
+          assert.strictEqual( typeof error, "object" );
+        } );
+
+        it( "Has a name property", () => {
+          assert.exists( error.name );
+        } );
+
+        it( "Name property has message 'Document needs to be an object'", () => {
+          assert.strictEqual( error.message, "Document needs to be an object" );
         } );
       } );
     } );
 
     mocha.describe( "Retrieve", () => {
-      it( "Should get a file", async () => {
-        const expectedKeys = [ "filename", "meta", "$loki" ];
-        const result = await CordService.getFile( cordToRetrieve.files );
+      context( "File by name", () => {
+        let result;
 
-        assert.exists( result );
-        assert.isObject( result );
-        assert.containsAllKeys( result, expectedKeys );
+        it( "Retrieves a file", async () => {
+          result = await CordService.getFile( cordToRetrieve.files );
+
+          assert.exists( result );
+        } );
+
+        it( "Is an object", () => {
+          assert.isObject( result );
+        } );
+
+        it( "Has all required keys", () => {
+          const expectedKeys = [ "filename", "meta", "$loki" ];
+          assert.containsAllKeys( result, expectedKeys );
+        } );
       } );
 
-      it( "Should get a file by Cord ID", async () => {
-        const expectedKeys = [ "filename", "meta", "$loki" ];
-        const result = await CordServiceInstance.getFilesByCordId( cordToRetrieve._id );
+      context( "File by Cord ID", () => {
+        let result;
 
-        assert.exists( result );
-        assert.isObject( result );
-        assert.containsAllKeys( result, expectedKeys );
+        it( "Retrieves a file by Cord ID", async () => {
+          result = await CordServiceInstance.getFilesByCordId( cordToRetrieve._id );
+
+          assert.exists( result );
+        } );
+
+        it( "Is an object", () => {
+          assert.isObject( result );
+        } );
+
+        it( "Has all required keys", () => {
+          const expectedKeys = [ "filename", "meta", "$loki" ];
+          assert.containsAllKeys( result, expectedKeys );
+        } );
       } );
     } );
   } );
@@ -291,12 +477,22 @@ mocha.describe( "Cords Service", () => {
   } );
 
   mocha.describe( "Category list", () => {
-    it( "Should retrieve Category list", async () => {
-      const result = await CordServiceInstance.getCategoryList( {} );
+    context( "Retrieve", () => {
+      let result;
 
-      assert.exists( result );
-      assert.isArray( result );
-      assert.isAtLeast( result.length, 1 );
+      it( "Should retrieve Category list", async () => {
+        result = await CordServiceInstance.getCategoryList( {} );
+
+        assert.exists( result );
+      } );
+
+      it( "Is an array", () => {
+        assert.isArray( result );
+      } );
+
+      it( "Has length of at least 1", () => {
+        assert.isAtLeast( result.length, 1 );
+      } );
     } );
   } );
 } );

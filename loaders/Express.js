@@ -30,7 +30,6 @@ class ExpressLoader {
     // Pass app to routes
     routes( app );
 
-
     // Start application
     this.server = app.listen( config.port, () => {
       logger.info( `Express running, now listening on port ${config.port}` );
