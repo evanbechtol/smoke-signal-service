@@ -1,6 +1,7 @@
-const express        = require( "express" );
-const auth           = require( "../../middlewares/eAuth" );
+const express = require( "express" );
+const auth = require( "../../middlewares/eAuth" );
 const cordController = require( "../../controllers/Cords" );
+const token = require( "../../middlewares/token" );
 
 let router = express.Router();
 
@@ -13,6 +14,10 @@ let router = express.Router();
  * by MongoDB
  * @returns Status code 200 and data if query successful. 500 if an error occurs
  */
-router.get( "/:id", auth.validateApp, cordController.getFile );
+router.get( "/:id",
+  token.validateToken,
+  auth.validateApp,
+  cordController.getFile
+);
 
 module.exports = router;

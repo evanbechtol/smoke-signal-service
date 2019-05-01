@@ -309,7 +309,6 @@ async function getFile ( req, res ) {
       res.setHeader( "Content-Type", result.mimetype );
       fs.createReadStream( path.join( uploadPath, result.filename ) ).pipe( res );
     } catch ( err ) {
-      logger.error( err );
       res.status( 500 ).send( resUtil.sendError( err ) );
       throw err;
     }
