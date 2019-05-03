@@ -6,6 +6,7 @@ ARG http_proxy=http://10.125.198.138:8080
 ARG https_proxy=http://10.125.198.138:8080
 ARG no_proxy="mongo, e_auth"
 ARG TZ=America/Chicago
+ARG command=start
 
 # Set the proxy and timezone environment variables using "-e" inputs during "docker run"
 ENV http_proxy=${http_proxy} https_proxy=${https_proxy} no_proxy=${no_proxy} TZ=${TZ}
@@ -19,4 +20,4 @@ COPY . /usr/src/app
 RUN npm install --production
 
 EXPOSE 3000
-CMD [ "npm", "start" ]
+CMD [ "npm", "${command}" ]
