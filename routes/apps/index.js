@@ -1,5 +1,6 @@
-const express        = require( "express" );
+const express = require( "express" );
 const auth = require( "../../middlewares/eAuth" );
+const token = require( "../../middlewares/token" );
 const appsController = require( "../../controllers/Apps" );
 
 let router = express.Router();
@@ -13,6 +14,10 @@ let router = express.Router();
  * @returns Status code 200 and data if query successful. 500 if an error
  *   occurs
  */
-router.get( "/", auth.validateApp, appsController.getApps );
+router.get( "/",
+  token.validateToken,
+  auth.validateApp,
+  appsController.getApps
+);
 
 module.exports = router;
