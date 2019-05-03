@@ -1,0 +1,60 @@
+image: docker:latest
+
+services:
+  - docker:dind
+
+stages:
+  - build
+  - test
+  - staging
+  - deploy
+
+build_image:
+  stage: build
+  only:
+    - master
+  tags:
+    - gitlab-ci
+  script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    - docker build -t $CI_REGISTRY_IMAGE:latest .
+    - docker push $CI_REGISTRY_IMAGE:latest
+
+SonarQube:
+  stage: test
+  tags:
+    - devtools
+  script:
+    - /opt/sonar-scanner/bin/sonar-scanner -Dsonar.projectVersion=$CI_COMMIT_REF_NAME -Dsonar.gitlab.ref_name=$CI_COMMIT_REF_NAME
+
+
+DeployPROD:
+  stage: deploy
+  only:
+    - master
+  tags:
+    - devtools
+  when: manual
+  script:
+    - ssh $CI_GITLAB_RUNNER@$CP_PROD_HOSTIP "sh cp_prod_docker_deploy.sh cp-service"
+
+
+BuildUnitImage:
+  stage: build
+  only:
+    - /^qa2_.*|qa1_.*|uat_.*|autounit/
+  tags:
+    - gitlab-ci
+  script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    - docker build -t $CI_REGISTRY_IMAGE:unit -f Dockerfile.unit .
+    - docker push $CI_REGISTRY_IMAGE:unit
+
+UnitTest:
+  stage: test
+  only:
+    - master
+  tags:
+    - devtools
+  script:
+    - ssh $CI_GITLAB_RUNNER@$CP2_HOSTIP 'sh cp2_docker_deploy.sh cp-service-test'
