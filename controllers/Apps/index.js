@@ -1,7 +1,7 @@
-const resUtil = require( "../../util/responseUtil" );
+const resUtil = require( "../../middlewares/response" );
 const qUtil   = require( "../../util/queryUtil" );
 const Apps    = require( "../../models/Apps" );
-const logger  = require( "../../config/logger" );
+const logger = require( "../../services/Logger" );
 
 
 module.exports = {

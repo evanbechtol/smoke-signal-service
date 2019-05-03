@@ -1,6 +1,6 @@
 const toolNotification = require("../../models/ToolNotification");
 const qUtil = require("../../util/queryUtil");
-const resUtil = require("../../util/responseUtil");
+const resUtil = require( "../../middlewares/response" );
 
 module.exports = {
   getToolNotificationUnreadList,

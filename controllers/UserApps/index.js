@@ -1,7 +1,7 @@
-const resUtil              = require( "../../util/responseUtil" );
-const objectUtil           = require( "../../util" );
+const resUtil = require( "../../middlewares/response" );
+const objectUtil = require( "../../services/ObjectService" );
 const UserApps             = require( "../../models/UserApps" );
-const logger               = require( "../../config/logger" );
+const logger = require( "../../services/Logger" );
 const userAppsKeyWhitelist = require( "../../config/whitelists").userApps;
 
 module.exports = {
