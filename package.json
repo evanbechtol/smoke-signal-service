@@ -5,6 +5,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "test": "mocha ./test --recursive",
     "start": "node index.js"
   },
   "repository": {
