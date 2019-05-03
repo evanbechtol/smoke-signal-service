@@ -7,14 +7,17 @@ const schema = mongoose.Schema( {
     index    : true,
     default  : "Open"
   },
+
   description : {
     type    : String,
     default : ""
   },
+
   files       : {
     type    : String,
     default : null
   },
+
   discussion  : [
     {
       time : {
@@ -49,23 +52,28 @@ const schema = mongoose.Schema( {
       ]
     }
   ],
+
   app         : {
     type     : String,
     required : true,
     index    : true
   },
+
   openedOn    : {
     type     : Date,
     required : true
   },
+
   resolvedOn  : {
     type : Date
   },
+
   category    : {
     type     : String,
     required : true,
     index    : true
   },
+
   rescuers    : [
     {
       _id      : {
@@ -78,6 +86,7 @@ const schema = mongoose.Schema( {
       }
     }
   ],
+
   puller      : {
     _id      : {
       type     : String,
@@ -88,15 +97,18 @@ const schema = mongoose.Schema( {
       required : true
     }
   },
+
   title       : {
     type     : String,
     required : true,
     index    : true
   },
+
   likes       : {
     type    : Number,
     default : 0
   },
+
   tags        : {
     type    : Array,
     index   : true,

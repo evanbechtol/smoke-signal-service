@@ -1,7 +1,7 @@
 {
   "name": "smoke-signal-service",
   "author": "Evan Bechtol <evan.bechtol@ericsson.com>",
-  "version": "1.0.0",
+  "version": "1.1.4",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -16,6 +16,7 @@
   },
   "homepage": "https://scmgr.eams.ericsson.net/incubation/smoke-signal-service#readme",
   "dependencies": {
+    "@sentry/node": "^5.1.0",
     "body-parser": "^1.18.2",
     "compression": "^1.7.1",
     "cors": "^2.8.5",
@@ -33,8 +34,11 @@
     "winston": "^3.2.1"
   },
   "devDependencies": {
+    "chai": "^4.2.0",
     "eslint": "^5.15.3",
-    "eslint-plugin-node": "^8.0.1"
+    "eslint-plugin-node": "^8.0.1",
+    "mocha": "^6.1.4",
+    "nyc": "^14.0.0"
   },
   "engines": {
     "node": ">=6.0.0"

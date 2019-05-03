@@ -1,79 +1,39 @@
-const bodyParser  = require( "body-parser" ),
-      config      = require( "./config" ),
-      express     = require( "express" ),
-      morgan      = require( "morgan" ),
-      path        = require( "path" ),
-      routes      = require( "./routes" ),
-      compression = require( "compression" ),
-      mongoose    = require( "mongoose" ),
-      logger      = require( "./config/logger" );
+const config = require( "./config" );
+const mongoose = require( "mongoose" );
+const logger = require( "./services/Logger" );
+const Sentry = require( "@sentry/node" );
 
-// This is dangerous a.f., but has to be done for prod
-//process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-//require('ssl-root-cas/latest').inject();
+// Initialize Sentry
+const SentryLoader = require( "./loaders/Sentry" );
+const SentryInstance = new SentryLoader( config.sentryDsn, config.env, config.release );
+SentryInstance.init();
+
+const mongooseOptions = {
+  useCreateIndex: true,
+  useNewUrlParser: true,
+  autoReconnect: true
+};
 
 mongoose.Promise = global.Promise;
-mongoose.connect( config.dbUrl, {
-  useCreateIndex  : true,
-  useNewUrlParser : true,
-  autoReconnect   : true
-}, ( err ) => {
-  if ( err ) {
-    throw err;
-  }
-  logger.info( "Database connection successful" );
 
-  let app = express();
+// Connect to the DB an initialize the app if successful
+mongoose.connect( config.dbUrl, mongooseOptions )
+  .then( () => {
+    logger.info( "Database connection successful" );
 
-// Serve static content
-  app.use( express.static( path.join( __dirname, "uploads" ) ) );
+    // Create express instance to setup API
+    const ExpressLoader = require( "./loaders/Express" );
+    const ExpressInstance = new ExpressLoader();
 
-// Set up middleware
-  app.use( morgan( "dev" ) );
-  app.use( compression() );
-  app.use( bodyParser.urlencoded( {
-    extended : false,
-    limit    : "20mb"
-  } ) );
-  app.use( bodyParser.json( { limit : "20mb" } ) );
+    // Create socket instance to handle connections
+    const SocketIoLoader = require( "./loaders/SocketIO" );
+    const socketPath = "/smoke-signal-service/socket.io";
+    new SocketIoLoader( ExpressInstance.getServer(), socketPath );
+  } )
+  .catch( err => {
+    //eslint-disable-next-line
+    console.error( err );
+    logger.error( err );
 
-  // Pass app to routes
-  routes( app );
-
-  // Setup error handling
-  app.use( errorHandler );
-
-  // Start application
-  const server = app.listen( config.port, () => {
-    logger.info( `Express running, now listening on port ${config.port}` );
+    Sentry.captureException( err );
   } );
-
-  const io = require( "socket.io" )( server, { path : "/smoke-signal-service/socket.io" } );
-  io.origins( "*:*" );
-  io.on( "connection", function ( socket ) {
-    logger.info( connMsg( socket.id, "connected", "/" ) );
-    require( "./controllers/Socket" )( io, socket );
-    socket.on( "disconnect", function () {
-      logger.info( connMsg( socket.id, "disconnected", "/" ) );
-    } );
-  } );
-
-  io.of( "/smoke-signal-service" ).on( "connection", function ( socket ) {
-    logger.info( connMsg( socket.id, "connected", "/smoke-signal/" ) );
-    require( "./controllers/Socket" )( io, socket );
-    socket.on( "disconnect", function () {
-      logger.info( connMsg( socket.id, "disconnected", "/smoke-signal/" ) );
-    } );
-  } );
-} );
-
-function connMsg ( action, id, nsp ) {
-  return `User ID '${id}' ${action} from namespace ${nsp}`;
-}
-
-function errorHandler ( error, req, res, next ) {
-  logger.error( error );
-  if ( res.headersSent ) {
-    return next( error );
-  }
-}

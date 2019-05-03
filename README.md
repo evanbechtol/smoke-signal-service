@@ -1,4 +1,4 @@
-# Smoke Singal Service
+# Smoke Signal Service
 Backend service for Smoke Signal app. Exposes a RESTful API and MongoDB database to interact with the application. 
 
 ### Contributing
@@ -23,19 +23,25 @@ Assumes that pre-requisites are met.
 - Install the dependencies 
    - Install application dependencies ```npm install```
 
-- Add the routes you need under the `routes` directory, and include require them in your `routes/index.js` file.
+### Project Structure
 ```
-| routes/
-| index.js
-|
-|---> user/
-     |---> index.js
-|
-|---> auth/
-     |---> index.js
+| -> config
+      | -> keysWhitelists //Whitelists for keys that are acceptable in each HTTP verb
+      | index.js //General application config variables
+      | messages.js //Standardized application messages for responses & errors
+| -> controllers //Interacts with Express and calls services for business logic, responds to requests
+| -> loaders //Initialize essential app functionality; Expresss, & SocketIO
+| -> middlewares //Perform route-level validation prior to Controller hand-off 
+| -> models //Maps MongoDB Collections to Mongoose Schemas for validation
+| -> routes //Defines Express API structure
+| -> services //Contains all business logic and interacts with MongoDB. Does not have knowledge of Express functionality
+| -> test //All tests live here and can be run using: npm test
+| -> uploads //Directory is created when files are uploaded to the app
+| -> util //Utility modules that are commonly used throughout the app, but are not necessarily services
+| index.js //Entry point for application
 ```
 
-### Starting 
+### Commands 
 * Run the command ```npm test``` to run the application in "development" mode.
 * Run the command ```npm start``` to run the application in "production" mode.
 
