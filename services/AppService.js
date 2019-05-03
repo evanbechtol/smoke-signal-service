@@ -6,8 +6,8 @@ class AppService {
    * @param AppModel {mongoose.model} Required: Instance of Mongoose model
    */
   constructor ( AppModel ) {
-    this.cordModel = AppModel;
-    this.mongooseServiceInstance = new MongooseService( this.cordModel );
+    this.appModel = AppModel;
+    this.mongooseServiceInstance = new MongooseService( this.appModel );
   }
 
   /**
