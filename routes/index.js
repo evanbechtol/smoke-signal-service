@@ -1,7 +1,7 @@
 const cords = require( "./cords" );
 const uploads = require( "./uploads" );
 const notifications = require( "./notifications" );
-const userApps = require( "./userApps" );
+const user = require( "./users" );
 const apps = require( "./apps" );
 
 const routes = app => {
@@ -23,7 +23,7 @@ const routes = app => {
   app.use( "/cords", cords );
   app.use( "/uploads", uploads );
   app.use( "/notifications", notifications );
-  app.use( "/user", userApps );
+  app.use( "/users", user );
   app.use( "/apps", apps );
 };
 

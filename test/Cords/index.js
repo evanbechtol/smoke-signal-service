@@ -285,10 +285,10 @@ mocha.describe( "Cords Service", () => {
   } );
 
   mocha.describe( "User stats", () => {
-    context( "When valid user provided", () => {
+    context( "When valid users provided", () => {
       let result;
 
-      it( "Retrieves user stats", async () => {
+      it( "Retrieves users stats", async () => {
         result = await CordServiceInstance.getUserStats( cordToRetrieve.puller );
 
         assert.exists( result );
@@ -304,7 +304,7 @@ mocha.describe( "Cords Service", () => {
       } );
     } );
 
-    context( "When invalid user provided", () => {
+    context( "When invalid users provided", () => {
       let error;
 
       it( "Throws an error", async () => {

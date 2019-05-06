@@ -1,6 +1,7 @@
 const express = require( "express" );
 const auth = require( "../../middlewares/eAuth" );
 const token = require( "../../middlewares/token" );
+const Validator = require( "../../middlewares/validators/Cords" );
 const notificationController = require( "../../controllers/Notifications" );
 
 let router = express.Router();
@@ -30,6 +31,8 @@ router.get( "/list",
  *   occurs
  */
 router.put( "/:id",
+  Validator.idIsPresent,
+  Validator.bodyIsPresent,
   token.validateToken,
   auth.validateApp,
   notificationController.updateNotification

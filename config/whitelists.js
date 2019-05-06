@@ -1,6 +1,6 @@
 module.exports = {
-  cords : {
-    model : [
+  cords: {
+    model: [
       "status",
       "description",
       "app",
@@ -13,7 +13,7 @@ module.exports = {
       "tags"
     ],
 
-    update : [
+    update: [
       "status",
       "description",
       "discussion",
@@ -26,7 +26,14 @@ module.exports = {
     ]
   },
 
-  userApps : {
-    model : [ "user", "apps" ]
+  users: {
+    model: [
+      "apps",
+      "email",
+      "firstName",
+      "lastName",
+      "teams",
+      "user"
+    ]
   }
 };

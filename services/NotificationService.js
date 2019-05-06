@@ -46,8 +46,10 @@ class NotificationService {
    * @returns {Promise<*>}
    */
   async create ( data, resp ) {
-    return await resp.forEach( async ( elem ) => {
-      const inputData = {
+    let promiseArr = [];
+
+    resp.forEach( elem => {
+      const createData = {
         notifyReceiver: elem.user,
         readTimeStamp: null,
         createdTimeStamp: new Date().toISOString(),
@@ -61,12 +63,10 @@ class NotificationService {
         createdBy: data.puller
       };
 
-      try {
-        return await this.mongooseServiceInstance.create( inputData );
-      } catch ( err ) {
-        throw new Error( err );
-      }
+      promiseArr.push( this.mongooseServiceInstance.create( createData ) );
     } );
+
+    return Promise.all( promiseArr );
   }
 
   async userDiscussion ( data ) {

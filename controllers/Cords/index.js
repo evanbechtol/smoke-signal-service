@@ -1,12 +1,23 @@
+// Models
 const Cords = require( "../../models/Cords" );
+const Notifications = require( "../../models/Notifications" );
+const Users = require( "../../models/User" );
+const CategoryList = require( "../../models/CategoryList/index.js" );
+
+// Services
 const CordService = require( "../../services/CordService" );
 const SlackService = require( "../../services/SlackService" );
-const CategoryList = require( "../../models/CategoryList/index.js" );
-const qUtil = require( "../../util/queryUtil" );
-const resUtil = require( "../../middlewares/response" );
+const NotificationService = require( "../../services/NotificationService" );
+const UserService = require( "../../services/UserService" );
+
+// Utils
 const logger = require( "../../services/Logger" );
+const qUtil = require( "../../util/queryUtil" );
 const CordsWhitelist = require( "../../config/keysWhitelists/cords" );
 const Sentry = require( "@sentry/node" );
+
+// Middlewares
+const resUtil = require( "../../middlewares/response" );
 
 // Required for retrieving uploaded files
 const path = require( "path" );
@@ -15,14 +26,12 @@ const ObjectService = require( "../../services/ObjectService" );
 const Messages = require( "../../config/messages" );
 const uploadPath = "uploads";
 
-// Create a usable instance of the Cord Service
+// Create usable instance of services
 const CordServiceInstance = new CordService( Cords );
 const CategoryServiceInstance = new CordService( CategoryList );
-
-// Create a usable instance of the Slack Service
+const NotificationServiceInstance = new NotificationService( Notifications );
+const UserServiceInstance = new UserService( Users );
 const SlackServiceInstance = new SlackService();
-const notificationController = require( "../Notifications" );
-const UserApps               = require( "../../models/UserApps" );
 
 module.exports = {
   createCord,
@@ -61,7 +70,7 @@ async function getCords ( req, res ) {
     logger.error( err );
     res.status( 500 ).send( resUtil.sendError( err ) );
 
-    // Capture the error with user information provided
+    // Capture the error with users information provided
     Sentry.withScope( scope => {
       scope.setTag( "query", queryStrings.query );
       Sentry.captureException( err );
@@ -101,7 +110,7 @@ async function getCordById ( req, res ) {
     logger.error( err );
     res.status( 500 ).send( resUtil.sendError( err ) );
 
-    // Capture the error with user information provided
+    // Capture the error with users information provided
     Sentry.withScope( scope => {
       scope.setTag( "id", req.id );
       Sentry.captureException( err );
@@ -125,7 +134,7 @@ async function getCordByStatus ( req, res ) {
     logger.error( err );
     res.status( 500 ).send( resUtil.sendError( err ) );
 
-    // Capture the error with user information provided
+    // Capture the error with users information provided
     Sentry.withScope( scope => {
       scope.setTag( "status", req.status );
       Sentry.captureException( err );
@@ -134,7 +143,7 @@ async function getCordByStatus ( req, res ) {
 }
 
 /**
- * @description Retrieve cords by their status and by the user who pulled
+ * @description Retrieve cords by their status and by the users who pulled
  * the cord
  * @param req
  * @param res
@@ -151,7 +160,7 @@ async function getCordForUser ( req, res ) {
     logger.error( err );
     res.status( 500 ).send( resUtil.sendError( err ) );
 
-    // Capture the error with user information provided
+    // Capture the error with users information provided
     Sentry.withScope( scope => {
       scope.setUser( req.user );
       Sentry.captureException( err );
@@ -160,7 +169,7 @@ async function getCordForUser ( req, res ) {
 }
 
 /**
- * @description Retrieve user statistics for cord related data
+ * @description Retrieve users statistics for cord related data
  * @param req
  * @param res
  * @returns {Promise<*>}
@@ -173,7 +182,7 @@ async function getUserStats ( req, res ) {
     logger.error( err );
     res.status( 500 ).send( resUtil.sendError( err ) );
 
-    // Capture the error with user information provided
+    // Capture the error with users information provided
     Sentry.withScope( scope => {
       scope.setUser( req.user );
       Sentry.captureException( err );
@@ -188,18 +197,27 @@ async function getUserStats ( req, res ) {
  * @returns {Promise<*>}
  */
 async function createCord ( req, res ) {
-  const body = ObjectService.pick( req.body, CordsWhitelist.post );
-
   try {
-    const data = await CordServiceInstance.create( body );
+    // Create Cord
+    const body = ObjectService.pick( req.body, CordsWhitelist.post );
+    const createdCord = await CordServiceInstance.create( body );
 
+    // Retrieve User Apps
+    const userQuery = {
+      apps: createdCord.app,
+      "user.username": { $ne: createdCord.puller.username }
+    };
+    const userResult = await UserServiceInstance.find( userQuery );
+
+    // Send Slack message
     req.body.header = req.header( "Referer" );
-    await SlackServiceInstance.sendNotification( req.body, true );
+    //await SlackServiceInstance.sendNotification( req.body, true );
 
-    return notificationController.createNotification( createdCord, userAppsResponse )
-      .then( resp => {
-        return res.send( resUtil.sendSuccess( resp ) )
-      } );
+    // Create Notification
+    createdCord.subject = Messages.notifications.cordCreated;
+    const notifications = await NotificationServiceInstance.create( createdCord, userResult );
+
+    return res.status( 204 ).send( resUtil.sendSuccess( notifications ) );
   } catch ( err ) {
     logger.error( err );
     res.status( 500 ).send( resUtil.sendError( err ) );
@@ -219,17 +237,14 @@ async function updateCord ( req, res ) {
 
   try {
     const data = await CordServiceInstance.update( req.id, body );
-
-    await SlackServiceInstance.sendNotification( req.body, false );
-    notificationController.userDiscussion( results )
-      .then( resp => {
-        return res.send( resUtil.sendSuccess( resp ) );
-      } );
+    const slackResult = await SlackServiceInstance.sendNotification( data, false );
+    const notificationResult = NotificationServiceInstance.userDiscussion( slackResult );
+    return res.send( resUtil.sendSuccess( notificationResult ) );
   } catch ( err ) {
     logger.error( err );
     res.status( 500 ).send( resUtil.sendError( err ) );
 
-    // Capture the error with user information provided
+    // Capture the error with users information provided
     Sentry.withScope( scope => {
       scope.setTag( "id", req.id );
       Sentry.captureException( err );
@@ -257,7 +272,7 @@ async function updateRescuers ( req, res ) {
       logger.error( err );
       res.status( 500 ).send( resUtil.sendError( err ) );
 
-      // Capture the error with user information provided
+      // Capture the error with users information provided
       Sentry.withScope( scope => {
         scope.setTag( "id", req.id );
         Sentry.captureException( err );
@@ -276,7 +291,7 @@ async function upload ( req, res ) {
     logger.error( err );
     res.status( 500 ).send( resUtil.sendError( err ) );
 
-    // Capture the error with user information provided
+    // Capture the error with users information provided
     Sentry.withScope( scope => {
       scope.setTag( "id", req.id );
       Sentry.captureException( err );
@@ -294,7 +309,7 @@ async function getFilesByCordId ( req, res ) {
     logger.error( err );
     res.status( 500 ).send( resUtil.sendError( err ) );
 
-    // Capture the error with user information provided
+    // Capture the error with users information provided
     Sentry.withScope( scope => {
       scope.setTag( "id", req.id );
       Sentry.captureException( err );
@@ -332,7 +347,7 @@ async function deleteCord ( req, res ) {
     logger.error( err );
     res.status( 500 ).send( resUtil.sendError( err ) );
 
-    // Capture the error with user information provided
+    // Capture the error with users information provided
     Sentry.withScope( scope => {
       scope.setTag( "id", req.id );
       Sentry.captureException( err );

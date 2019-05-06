@@ -1,4 +1,4 @@
-const Notifications = require( "../../models/ToolNotification" );
+const Notifications = require( "../../models/Notifications" );
 const qUtil = require( "../../util/queryUtil" );
 const resUtil = require( "../../middlewares/response" );
 const logger = require( "../../services/Logger" );
@@ -30,7 +30,7 @@ async function getToolNotificationUnreadList ( req, res ) {
     logger.error( err );
     res.status( 500 ).send( resUtil.sendError( err ) );
 
-    // Capture the error with user information provided
+    // Capture the error with users information provided
     Sentry.withScope( scope => {
       scope.setTag( "query", queryStrings.query );
       Sentry.captureException( err );
@@ -55,7 +55,7 @@ async function updateNotification ( req, res ) {
     logger.error( err );
     res.status( 500 ).send( resUtil.sendError( err ) );
 
-    // Capture the error with user information provided
+    // Capture the error with users information provided
     Sentry.withScope( scope => {
       scope.setTag( "id", req.id );
       Sentry.captureException( err );

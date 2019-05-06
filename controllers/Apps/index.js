@@ -22,7 +22,7 @@ async function getApps ( req, res ) {
     logger.error( err );
     res.status( 500 ).send( resUtil.sendError( err ) );
 
-    // Capture the error with user information provided
+    // Capture the error with users information provided
     Sentry.withScope( scope => {
       scope.setTag( "query", queryStrings.query );
       Sentry.captureException( err );

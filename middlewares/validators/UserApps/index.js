@@ -4,9 +4,7 @@ const ObjectId = require( "mongoose" ).Types.ObjectId;
 
 module.exports = {
   bodyIsPresent,
-  fileIsPresent,
   idIsPresent,
-  statusIsPresent,
   userIsPresent
 };
 
@@ -24,23 +22,6 @@ function idIsPresent ( req, res, next ) {
     next();
   } else {
     res.status( 400 ).send( resMw.sendError( Messages.responses.idNotProvided ) );
-  }
-}
-
-/**
- * @description Validate that an Status was provided and that it is valid
- * @param req {object} Express MW
- * @param res {object} Express MW
- * @param next {function} Express MW
- */
-function statusIsPresent ( req, res, next ) {
-  const status = req.query.status || req.params.status || null;
-
-  if ( status && typeof status === "string" && status.length > 0 ) {
-    req.status = status;
-    next();
-  } else {
-    res.status( 400 ).send( resMw.sendError( Messages.responses.statusNotProvided ) );
   }
 }
 
@@ -90,16 +71,3 @@ function userIsPresent ( req, res, next ) {
   }
 }
 
-/**
- * @description Validate that file is present and valid
- * @param req {object} Express MW
- * @param res {object} Express MW
- * @param next {function} Express MW
- */
-function fileIsPresent ( req, res, next ) {
-  if ( req.file ) {
-    next();
-  } else {
-    res.status( 400 ).send( resMw.sendError( Messages.responses.userNotProvided ) );
-  }
-}
