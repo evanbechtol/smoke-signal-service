@@ -211,7 +211,7 @@ async function createCord ( req, res ) {
 
     // Send Slack message
     req.body.header = req.header( "Referer" );
-    //await SlackServiceInstance.sendNotification( req.body, true );
+    await SlackServiceInstance.sendNotification( req.body, true );
 
     // Create Notification
     createdCord.subject = Messages.notifications.cordCreated;
