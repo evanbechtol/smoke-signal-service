@@ -9,7 +9,7 @@ class SocketIOLoader {
     io.origins( "*:*" );
 
     // Events for default namespace
-    io.of( "/", function ( socket ) {
+    io.on( "connection", function ( socket ) {
       logger.info( SocketIOLoader.connMsg( socket.id, "connected", "/" ) );
 
       require( SocketControllerPath )( io, socket );
