@@ -27,7 +27,7 @@ mongoose.connect( config.dbUrl, mongooseOptions )
 
     // Create socket instance to handle connections
     const SocketIoLoader = require( "./loaders/SocketIO" );
-    const socketPath = "/smoke-signal-service/socket.io";
+    const socketPath = "/smoke-signal-socket/socket.io";
     new SocketIoLoader( ExpressInstance.getServer(), socketPath );
   } )
   .catch( err => {

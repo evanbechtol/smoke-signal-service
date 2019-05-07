@@ -128,7 +128,7 @@ router.get( "/status/:status",
 
 /**
  * @method GET
- * @description Retrieve documents matching the user provided
+ * @description Retrieve documents matching the users provided
  * @param user {string} User object to retrieve cords for
  * @returns Status code 200 if successful with retrieved documents, 500 if
  *   error occurs
@@ -142,7 +142,7 @@ router.get( "/user/:user",
 
 /**
  * @method GET
- * @description Retrieve statistics for user matching ID provided
+ * @description Retrieve statistics for users matching ID provided
  * @param status {string} User to retrieve statistics for
  * @returns Status code 200 if successful with retrieved documents, 500 if
  *   error occurs

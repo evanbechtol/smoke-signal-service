@@ -18,7 +18,7 @@ function validateApp ( req, res, next ) {
   const options = { auth: { bearer: req.token } };
   request.get( url, options, function ( err, response, body ) {
     if ( err ) {
-      return res.status( 500 ).send( resUtil.sendError( err ) );
+      return res.status( 500 ).send( resUtil.sendError( err.message ) );
     }
 
     let data;
