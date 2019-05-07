@@ -211,13 +211,14 @@ async function createCord ( req, res ) {
 
     // Send Slack message
     req.body.header = req.header( "Referer" );
-    await SlackServiceInstance.sendNotification( req.body, true );
+    //await SlackServiceInstance.sendNotification( req.body, true );
 
     // Create Notification
     createdCord.subject = Messages.notifications.cordCreated;
     const notifications = await NotificationServiceInstance.create( createdCord, userResult );
 
-    return res.status( 204 ).send( resUtil.sendSuccess( notifications ) );
+    const responseBody = notifications && notifications.length ? notifications : createdCord._doc;
+    return res.send( resUtil.sendSuccess( responseBody ) );
   } catch ( err ) {
     logger.error( err );
     res.status( 500 ).send( resUtil.sendError( err ) );

@@ -5,7 +5,7 @@ module.exports = {
   500: "",
 
   notifications: {
-    cordCreated: "New Cord has been created"
+    cordCreated: "A cord has been pulled"
   },
 
   responses: {
