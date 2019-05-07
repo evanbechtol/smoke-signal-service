@@ -236,9 +236,14 @@ async function updateCord ( req, res ) {
   const body = ObjectService.pick( req.body, CordsWhitelist.put );
 
   try {
-    const data = await CordServiceInstance.update( req.id, body );
-    const slackResult = await SlackServiceInstance.sendNotification( data, false );
-    const notificationResult = NotificationServiceInstance.userDiscussion( slackResult );
+    // Update the cord
+    const updatedCord = await CordServiceInstance.update( req.id, body );
+
+    // Send slack notification
+    await SlackServiceInstance.sendNotification( updatedCord, false );
+
+    // Send tool notification
+    const notificationResult = NotificationServiceInstance.userDiscussion( updatedCord );
     return res.send( resUtil.sendSuccess( notificationResult ) );
   } catch ( err ) {
     logger.error( err );
