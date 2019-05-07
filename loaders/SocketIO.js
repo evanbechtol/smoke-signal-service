@@ -28,7 +28,7 @@ class SocketIOLoader {
     } );
 
     // Events for /smoke-signal-service namespace
-    io.of( "/smoke-signal-service" ).on( "connection", function ( socket ) {
+    io.of( "/smoke-signal-socket" ).on( "connection", function ( socket ) {
       logger.info( SocketIOLoader.connMsg( socket.id, "connected", "/smoke-signal/" ) );
 
       require( SocketControllerPath )( io, socket );
