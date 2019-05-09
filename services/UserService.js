@@ -1,4 +1,6 @@
 const MongooseService = require( "./MongooseService" );
+const ObjectService = require( "../services/ObjectService" );
+const usersKeyWhitelist = require( "../config/whitelists" ).users;
 
 class UserService {
   /**
@@ -31,10 +33,11 @@ class UserService {
 
   /**
    * @description Create a single new cord document
-   * @param data {object} Required: Data to populate cord with
+   * @param body {object} Required: Data to populate cord with
    * @returns {Promise} Returns result of Mongoose query
    */
-  async create ( data ) {
+  async create ( body ) {
+    const data = ObjectService.pick( body, usersKeyWhitelist.model );
     return await this.mongooseServiceInstance.create( data );
   }
 }

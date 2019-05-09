@@ -1,9 +1,7 @@
 const resUtil = require( "../../middlewares/response" );
-const ObjectService = require( "../../services/ObjectService" );
 const UserService = require( "../../services/UserService" );
 const Users = require( "../../models/User" );
 const logger = require( "../../services/Logger" );
-const usersKeyWhitelist = require( "../../config/whitelists" ).users;
 
 const UserServiceInstance = new UserService( Users );
 
@@ -14,8 +12,7 @@ module.exports = {
 
 async function createUser ( req, res ) {
   try {
-    const body = ObjectService.pick( req.body, usersKeyWhitelist.model );
-    await UserServiceInstance.create( body );
+    await UserServiceInstance.create( req.body );
     return res.status( 204 ).send( resUtil.sendSuccess() );
   } catch ( err ) {
     logger.error( err );

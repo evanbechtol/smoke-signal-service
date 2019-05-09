@@ -6,10 +6,13 @@ const schema = mongoose.Schema( {
     _id: {
       type: String,
       index: true,
+      unique: true,
       required: true
     },
     username: {
       type: String,
+      unique: true,
+      index: true,
       required: true
     }
   },
