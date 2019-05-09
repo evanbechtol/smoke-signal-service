@@ -4,6 +4,12 @@ module.exports = {
   404: "",
   500: "",
 
+  auth: {
+    noUser: "",
+    unableToAuthenticate: "Either unable to login with provided username and" +
+      " password, or the account does not exist"
+  },
+
   notifications: {
     cordCreated: "A cord has been pulled"
   },

@@ -3,6 +3,7 @@ const uploads = require( "./uploads" );
 const notifications = require( "./notifications" );
 const user = require( "./users" );
 const apps = require( "./apps" );
+const auth = require( "./auth" );
 
 const routes = app => {
   app.use( ( req, res, next ) => {
@@ -25,6 +26,7 @@ const routes = app => {
   app.use( "/notifications", notifications );
   app.use( "/users", user );
   app.use( "/apps", apps );
+  app.use( "/auth", auth );
 };
 
 module.exports = routes;
