@@ -113,6 +113,11 @@ const schema = mongoose.Schema( {
     type    : Array,
     index   : true,
     default : []
+  },
+
+  answers: {
+    type: Array,
+    default: []
   }
 } );
 
