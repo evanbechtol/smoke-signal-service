@@ -7,10 +7,13 @@ const schema = mongoose.Schema( {
     index: true
   },
 
-  permissions: {
-    type: Array,
-    default: []
-  },
+  members: [
+    {
+      user: {
+        type: Object
+      }
+    }
+  ],
 
   createdOn: {
     type: Date,
@@ -22,4 +25,4 @@ const schema = mongoose.Schema( {
   }
 } );
 
-module.exports = mongoose.model( "Roles", schema );
+module.exports = mongoose.model( "Teams", schema );
