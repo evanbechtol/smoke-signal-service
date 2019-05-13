@@ -2,11 +2,13 @@ const resUtil = require( "../../middlewares/response" );
 const UserService = require( "../../services/UserService" );
 const Users = require( "../../models/User" );
 const logger = require( "../../services/Logger" );
+const qUtil = require( "../../util/queryUtil" );
 
 const UserServiceInstance = new UserService( Users );
 
 module.exports = {
   createUser,
+  getUser,
   getUserById
 };
 
@@ -17,6 +19,17 @@ async function createUser ( req, res ) {
   } catch ( err ) {
     logger.error( err );
     res.status( 500 ).send( resUtil.sendError( err ) );
+    throw new Error( err );
+  }
+}
+
+async function getUser ( req, res ) {
+  try {
+    const queryStrings = qUtil.getDbQueryStrings( req.query );
+    const user = await UserServiceInstance.findOne( queryStrings.query );
+    return res.send( resUtil.sendSuccess( user ) );
+  } catch ( err ) {
+    logger.error( err );
     throw new Error( err );
   }
 }

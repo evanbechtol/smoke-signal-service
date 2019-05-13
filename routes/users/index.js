@@ -1,5 +1,4 @@
 const express = require( "express" );
-const auth = require( "../../middlewares/eAuth" );
 const token = require( "../../middlewares/token" );
 const Validator = require( "../../middlewares/validators/Cords" );
 const userController = require( "../../controllers/Users" );
@@ -18,10 +17,14 @@ router.post( "/",
   userController.createUser
 );
 
+router.get( "/",
+  token.validateToken,
+  userController.getUser
+);
+
 router.get( "/:id",
   Validator.idIsPresent,
   token.validateToken,
-  auth.validateApp,
   userController.getUserById
 );
 

@@ -23,6 +23,16 @@ class UserService {
   }
 
   /**
+   * @description Retrieve a single document by query
+   * @param query {object} Required: Mongoose query object
+   * @param  projection [object] Optional: Mongoose query object
+   * @returns {Promise<void>}
+   */
+  async findOne ( query, projection = { __v: 0 } ) {
+    return await this.mongooseServiceInstance.findOne( query, projection );
+  }
+
+  /**
    * @description Get a single document by ID
    * @param id {string} Required: Mongoose Object ID for document
    * @returns {Promise<any>} Returns result of Mongoose query
