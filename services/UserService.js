@@ -1,6 +1,8 @@
+const ObjectId = require( "mongoose" ).Types.ObjectId;
 const MongooseService = require( "./MongooseService" );
 const ObjectService = require( "../services/ObjectService" );
 const usersKeyWhitelist = require( "../config/whitelists" ).users;
+const Messages = require( "../config/messages" );
 
 class UserService {
   /**
@@ -10,6 +12,16 @@ class UserService {
   constructor ( UserModel ) {
     this.userModel = UserModel;
     this.mongooseServiceInstance = new MongooseService( this.userModel );
+  }
+
+  /**
+   * @description Create a single new cord document
+   * @param body {object} Required: Data to populate cord with
+   * @returns {Promise} Returns result of Mongoose query
+   */
+  async create ( body ) {
+    const data = ObjectService.pick( body, usersKeyWhitelist.model );
+    return await this.mongooseServiceInstance.create( data );
   }
 
   /**
@@ -42,13 +54,20 @@ class UserService {
   }
 
   /**
-   * @description Create a single new cord document
-   * @param body {object} Required: Data to populate cord with
-   * @returns {Promise} Returns result of Mongoose query
+   * @description Update a single user document
+   * @param id  {string} Mongoose Object ID for document
+   * @param data {object} Data to populate user with
+   * @returns {Promise<any>} Returns result of Mongoose query
    */
-  async create ( body ) {
-    const data = ObjectService.pick( body, usersKeyWhitelist.model );
-    return await this.mongooseServiceInstance.create( data );
+  async update ( id, data ) {
+    const isValidId = id && ObjectId.isValid( id );
+    const isValidBody = data && typeof data === "object";
+
+    if ( isValidId && isValidBody ) {
+      return await this.mongooseServiceInstance.update( id, data );
+    } else {
+      throw new Error( Messages.response.invalidIdProvided );
+    }
   }
 }
 

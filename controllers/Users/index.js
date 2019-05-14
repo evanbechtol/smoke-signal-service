@@ -9,7 +9,8 @@ const UserServiceInstance = new UserService( Users );
 module.exports = {
   createUser,
   getUser,
-  getUserById
+  getUserById,
+  updateUser
 };
 
 async function createUser ( req, res ) {
@@ -40,6 +41,17 @@ async function getUserById ( req, res ) {
     return res.send( resUtil.sendSuccess( user ) );
   } catch ( err ) {
     logger.error( err );
+    throw new Error( err );
+  }
+}
+
+async function updateUser ( req, res ) {
+  try {
+    const user = await UserServiceInstance.update( req.id, req.body );
+    return res.send( resUtil.sendSuccess( user ) );
+  } catch ( err ) {
+    logger.error( err );
+    res.send( resUtil.sendError( err ) );
     throw new Error( err );
   }
 }

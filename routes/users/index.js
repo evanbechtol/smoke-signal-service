@@ -17,6 +17,13 @@ router.post( "/",
   userController.createUser
 );
 
+router.put( "/:id",
+  Validator.idIsPresent,
+  Validator.bodyIsPresent,
+  token.validateToken,
+  userController.updateUser
+);
+
 router.get( "/",
   token.validateToken,
   userController.getUser
