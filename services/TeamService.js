@@ -20,6 +20,8 @@ class TeamService {
    * @returns {Promise} Returns result of Mongoose query
    */
   async create ( body ) {
+    body.createdOn = new Date();
+    body.lastModifiedOn = body.createdOn;
     const data = ObjectService.pick( body, teamsKeyWhitelist.model );
     return await this.mongooseServiceInstance.create( data );
   }
