@@ -35,5 +35,14 @@ module.exports = {
       "teams",
       "user"
     ]
+  },
+
+  teams: {
+    model: [
+      "name",
+      "members",
+      "createdOn",
+      "lastModifiedOn"
+    ]
   }
 };
