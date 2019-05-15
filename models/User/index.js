@@ -17,12 +17,10 @@ const schema = mongoose.Schema( {
     }
   },
 
-  teams: [
-    {
-      _id: { type: String },
-      name: { type: String }
-    }
-  ],
+  teams: {
+    type: Array,
+    default: []
+  },
 
   firstName: {
     type: String,

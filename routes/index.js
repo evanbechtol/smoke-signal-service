@@ -1,7 +1,8 @@
 const cords = require( "./cords" );
 const uploads = require( "./uploads" );
 const notifications = require( "./notifications" );
-const user = require( "./users" );
+const users = require( "./users" );
+const teams = require( "./teams" );
 const apps = require( "./apps" );
 const auth = require( "./auth" );
 
@@ -24,7 +25,8 @@ const routes = app => {
   app.use( "/cords", cords );
   app.use( "/uploads", uploads );
   app.use( "/notifications", notifications );
-  app.use( "/users", user );
+  app.use( "/users", users );
+  app.use( "/teams", teams );
   app.use( "/apps", apps );
   app.use( "/auth", auth );
 };
