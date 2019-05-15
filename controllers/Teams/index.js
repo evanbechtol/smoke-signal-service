@@ -27,8 +27,8 @@ async function createTeam ( req, res ) {
 async function getTeam ( req, res ) {
   try {
     const queryStrings = qUtil.getDbQueryStrings( req.query );
-    const user = await TeamServiceInstance.findOne( queryStrings.query );
-    return res.send( resUtil.sendSuccess( user ) );
+    const teams = await TeamServiceInstance.find( queryStrings.query );
+    return res.send( resUtil.sendSuccess( teams ) );
   } catch ( err ) {
     logger.error( err );
     throw new Error( err );
