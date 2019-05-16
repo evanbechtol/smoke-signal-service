@@ -109,8 +109,7 @@ class TeamService {
       throw new Error( Messages.response.invalidMemberProvided );
     } else {
       // Find the team to update members for
-      const findTeamProjection = { members: 1, name: 1, _id: 1 };
-      const team = await this.mongooseServiceInstance.findById( id, findTeamProjection );
+      const team = await this.mongooseServiceInstance.findById( id, { __v: 0 } );
 
       if ( team ) {
         // Make sure that member property only contains whitelisted keys
@@ -146,7 +145,12 @@ class TeamService {
     // User is not on this team
     else if ( filteredTeamMembers.length === 0 ) {
       team.members.push( user );
-      const updateQuery = { $set: { members: team.members } };
+      const updateQuery = {
+        $set: {
+          members: team.members,
+          lastModifiedOn: new Date()
+        }
+      };
       return await this.mongooseServiceInstance.update( team._id, updateQuery );
     }
   }
@@ -169,7 +173,12 @@ class TeamService {
     // User is on this team
     else if ( filteredTeamMembers.length >= 1 ) {
       team.members = team.members.filter( teamMember => !teamMember._id.equals( user._id ) );
-      const updateQuery = { $set: { members: team.members } };
+      const updateQuery = {
+        $set: {
+          members: team.members,
+          lastModifiedOn: new Date()
+        }
+      };
       return await this.mongooseServiceInstance.update( team._id, updateQuery );
     }
   }
