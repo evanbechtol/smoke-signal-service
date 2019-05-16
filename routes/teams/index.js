@@ -6,10 +6,7 @@ let router = express.Router();
 
 /**
  * @method POST
- * @description Create a Team, provided that all required keys are provided
- * @param body {object} Object used to create the document
- * @returns Status code 200 if successful with created document, 500 if error
- *   occurs
+ * @description Create a Team
  */
 router.post( "/",
   Validator.bodyIsPresent,
@@ -17,6 +14,10 @@ router.post( "/",
   teamController.createTeam
 );
 
+/**
+ * @method PUT
+ * @description Update a Team
+ */
 router.put( "/:id",
   Validator.idIsPresent,
   Validator.bodyIsPresent,
@@ -24,11 +25,41 @@ router.put( "/:id",
   teamController.updateTeam
 );
 
+/**
+ * @method PUT
+ * @description Update a Team's members
+ */
+router.put( "/members/:id",
+  Validator.idIsPresent,
+  Validator.bodyIsPresent,
+  token.validateToken,
+  teamController.updateMembers
+);
+
+/**
+ * @method GET
+ * @description Retrieve a Team's members
+ */
+router.get( "/members/:id",
+  Validator.idIsPresent,
+  Validator.bodyIsPresent,
+  token.validateToken,
+  teamController.updateMembers
+);
+
+/**
+ * @method GET
+ * @description Retrieve teams, can provide a query to filter result set
+ */
 router.get( "/",
   token.validateToken,
   teamController.getTeam
 );
 
+/**
+ * @method GET
+ * @description Retrieve a single team by the MongoDB Object ID (_id)
+ */
 router.get( "/:id",
   Validator.idIsPresent,
   token.validateToken,
