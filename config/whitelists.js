@@ -38,6 +38,14 @@ module.exports = {
   },
 
   teams: {
+    members: [
+      "_id",
+      "email",
+      "firstName",
+      "lastName",
+      "user"
+    ],
+
     model: [
       "name",
       "members",

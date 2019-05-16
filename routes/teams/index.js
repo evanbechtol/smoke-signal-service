@@ -42,9 +42,8 @@ router.put( "/members/:id",
  */
 router.get( "/members/:id",
   Validator.idIsPresent,
-  Validator.bodyIsPresent,
   token.validateToken,
-  teamController.updateMembers
+  teamController.getTeamMembers
 );
 
 /**

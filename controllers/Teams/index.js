@@ -10,7 +10,9 @@ module.exports = {
   createTeam,
   getTeam,
   getTeamById,
-  updateTeam
+  getTeamMembers,
+  updateTeam,
+  updateMembers
 };
 
 async function createTeam ( req, res ) {
@@ -37,18 +39,41 @@ async function getTeam ( req, res ) {
 
 async function getTeamById ( req, res ) {
   try {
-    const user = await TeamServiceInstance.findById( req.id );
-    return res.send( resUtil.sendSuccess( user ) );
+    const team = await TeamServiceInstance.findById( req.id );
+    return res.send( resUtil.sendSuccess( team ) );
   } catch ( err ) {
     logger.error( err );
     throw new Error( err );
   }
 }
 
+async function getTeamMembers ( req, res ) {
+  try {
+    const team = await TeamServiceInstance.findById( req.id );
+    const responseData = team ? team.members : [];
+    return res.send( resUtil.sendSuccess( responseData ) );
+  } catch ( err ) {
+    logger.error( err );
+    res.send( resUtil.sendError( err ) );
+    throw new Error( err );
+  }
+}
+
 async function updateTeam ( req, res ) {
   try {
-    const user = await TeamServiceInstance.update( req.id, req.body );
-    return res.send( resUtil.sendSuccess( user ) );
+    const team = await TeamServiceInstance.update( req.id, req.body );
+    return res.send( resUtil.sendSuccess( team ) );
+  } catch ( err ) {
+    logger.error( err );
+    res.send( resUtil.sendError( err ) );
+    throw new Error( err );
+  }
+}
+
+async function updateMembers ( req, res ) {
+  try {
+    const team = await TeamServiceInstance.updateMembers( req.id, req.body );
+    return res.send( resUtil.sendSuccess( team ) );
   } catch ( err ) {
     logger.error( err );
     res.send( resUtil.sendError( err ) );
