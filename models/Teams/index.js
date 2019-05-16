@@ -4,7 +4,9 @@ const schema = mongoose.Schema( {
   name: {
     type: String,
     required: true,
-    index: true
+    index: true,
+    unique: true,
+    min: 3
   },
 
   members: [
