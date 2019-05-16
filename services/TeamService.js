@@ -63,12 +63,17 @@ class TeamService {
    */
   async update ( id, data ) {
     const isValidId = id && ObjectId.isValid( id );
-    const isValidBody = data && typeof data === "object";
+    const bodyIsProvided = data && typeof data === "object";
+    const isValidBody = bodyIsProvided
+      && ObjectService.hasAllRequiredKeys( data, teamsKeyWhitelist.model );
 
-    if ( isValidId && isValidBody ) {
-      return await this.mongooseServiceInstance.update( id, data );
-    } else {
+    if ( !isValidId ) {
       throw new Error( Messages.response.invalidIdProvided );
+    } else if ( !isValidBody ) {
+      throw new Error( Messages.response.invalidBodyProvided );
+    } else {
+      data = ObjectService.pick( data, teamsKeyWhitelist.model );
+      return await this.mongooseServiceInstance.update( id, data );
     }
   }
 
