@@ -122,7 +122,7 @@ class TeamService {
           return await this._removeTeamMember( team, data.member );
         }
       } else {
-        throw new Error( Messages.response.teamNotFound );
+        throw new Error( Messages.responses.teamNotFound );
       }
     }
   }

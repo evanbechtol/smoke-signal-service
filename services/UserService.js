@@ -14,6 +14,7 @@ class UserService {
   constructor ( UserModel ) {
     this.userModel = UserModel;
     this.mongooseServiceInstance = new MongooseService( this.userModel );
+    this.teamServiceInstance = new TeamsService( Teams );
   }
 
   /**
@@ -89,12 +90,18 @@ class UserService {
     } else {
       // Retrieve the old user doc to compare teams property with new data
       const oldUserDocument = await this.mongooseServiceInstance.findById( data._id );
-      const TeamServiceInstance = new TeamsService( Teams );
 
+      /**
+       * @description Utility method to compare two arrays of objects
+       * @param otherArray {array} An array of objects to compare against
+       * another array of objects
+       * @returns {function(*): boolean} Returns the elements which are
+       * unique to the calling array
+       */
       const comparer = function ( otherArray ) {
         return function ( current ) {
           return otherArray.filter( function ( other ) {
-            return other.value === current.value && other.display === current.display;
+            return other._id === current._id;
           } ).length === 0;
         };
       };
@@ -106,12 +113,20 @@ class UserService {
 
       if ( onlyInOld.length > 0 ) {
         const updateData = { action: "remove", member: data };
-        await this._updateTeams( onlyInOld, updateData, TeamServiceInstance.updateMembers );
+        try {
+          await this._updateTeams( onlyInOld, updateData );
+        } catch ( err ) {
+          data.teams = data.teams.filter( team => team._id !== err._id );
+        }
       }
 
       if ( onlyInNew.length > 0 ) {
         const updateData = { action: "add", member: data };
-        await this._updateTeams( onlyInNew, updateData, TeamServiceInstance.updateMembers );
+        try {
+          await this._updateTeams( onlyInNew, updateData );
+        } catch ( err ) {
+          data.teams = data.teams.filter( team => team._id !== err._id );
+        }
       }
 
       return await this.mongooseServiceInstance.update( id, data );
@@ -123,14 +138,20 @@ class UserService {
    * or removed from their account
    * @param teams {array} Array of teams objects
    * @param data {object} Data to be used in team update
-   * @param cb {function} Callback method to be performed
    * @returns {Promise<*>}
    * @private
    */
-  async _updateTeams ( teams, data, cb ) {
-    return await teams.map( async team => {
-      await cb( team._id, data );
-    } );
+  async _updateTeams ( teams, data ) {
+    let results = [];
+
+    for ( let team of teams ) {
+      try {
+        results = await this.teamServiceInstance.updateMembers( team._id, data );
+      } catch ( err ) {
+        throw ( team );
+      }
+    }
+    return results;
   }
 }
 
