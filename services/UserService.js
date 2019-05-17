@@ -116,7 +116,8 @@ class UserService {
         try {
           await this._updateTeams( onlyInOld, updateData );
         } catch ( err ) {
-          data.teams = data.teams.filter( team => team._id !== err._id );
+          // A team provided by client was invalid, remove from data
+          data.teams = this._removeInvalidTeams( data, err._id );
         }
       }
 
@@ -125,10 +126,12 @@ class UserService {
         try {
           await this._updateTeams( onlyInNew, updateData );
         } catch ( err ) {
-          data.teams = data.teams.filter( team => team._id !== err._id );
+          // A team provided by client was invalid, remove from data
+          data.teams = this._removeInvalidTeams( data, err._id );
         }
       }
 
+      // Everything is good, update the user account
       return await this.mongooseServiceInstance.update( id, data );
     }
   }
@@ -152,6 +155,10 @@ class UserService {
       }
     }
     return results;
+  }
+
+  _removeInvalidTeams ( data, badId ) {
+    return data.teams.filter( team => team._id !== badId );
   }
 }
 
