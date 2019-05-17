@@ -10,7 +10,8 @@ module.exports = {
   createUser,
   getUser,
   getUserById,
-  updateUser
+  updateUser,
+  updateUserTeams
 };
 
 async function createUser ( req, res ) {
@@ -48,6 +49,17 @@ async function getUserById ( req, res ) {
 async function updateUser ( req, res ) {
   try {
     const user = await UserServiceInstance.update( req.id, req.body );
+    return res.send( resUtil.sendSuccess( user ) );
+  } catch ( err ) {
+    logger.error( err );
+    res.send( resUtil.sendError( err ) );
+    throw new Error( err );
+  }
+}
+
+async function updateUserTeams ( req, res ) {
+  try {
+    const user = await UserServiceInstance.updateTeams( req.id, req.body );
     return res.send( resUtil.sendSuccess( user ) );
   } catch ( err ) {
     logger.error( err );
