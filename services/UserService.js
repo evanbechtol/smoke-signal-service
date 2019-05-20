@@ -23,8 +23,19 @@ class UserService {
    * @returns {Promise} Returns result of Mongoose query
    */
   async create ( body ) {
+    // Create the user
     const data = ObjectService.pick( body, usersKeyWhitelist.model );
-    return await this.mongooseServiceInstance.create( data );
+    await this.mongooseServiceInstance.create( data );
+
+    // Retrieve the created user
+    const createdUser = await this.mongooseServiceInstance.findOne( { email: data.email } );
+    const updateTeamData = {
+      action: "add",
+      member: createdUser
+    };
+
+    // Update teams that the user registered for
+    return await this._updateTeams( data.teams, updateTeamData );
   }
 
   /**
