@@ -15,6 +15,7 @@ module.exports = {
   },
 
   responses: {
+    answerNotProvided: "Answer is required",
     appTokenNotProvided: "appToken must be included in" +
       " querystring/params/body for request",
     bodyNotProvided: "Valid request body not provided",
@@ -27,6 +28,6 @@ module.exports = {
     invalidMemberProvided: "Invalid team member provided",
     statusNotProvided: "Valid status not provided",
     teamNotFound: "Team not found with provided ID",
-    userNotProvided: "Valid users not provided"
+    userNotProvided: "Valid user not provided"
   }
 };
