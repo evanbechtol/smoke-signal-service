@@ -1,4 +1,9 @@
 module.exports = {
+  answer: [
+    "answer",
+    "user"
+  ],
+
   get: [
     "_id",
     "app",
