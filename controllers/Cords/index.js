@@ -34,6 +34,7 @@ const UserServiceInstance = new UserService( Users );
 const SlackServiceInstance = new SlackService();
 
 module.exports = {
+  createAnswer,
   createCord,
   deleteCord,
   getCategoryList,
@@ -187,6 +188,25 @@ async function getUserStats ( req, res ) {
       scope.setUser( req.user );
       Sentry.captureException( err );
     } );
+  }
+}
+
+/**
+ * @description Create an answer for a cord with the provided body
+ * @param req
+ * @param res
+ * @returns {Promise<*>}
+ */
+async function createAnswer ( req, res ) {
+  try {
+    // Remove keys that are not allowed
+    const data = ObjectService.pick( req.body, CordsWhitelist.answer );
+    const updatedCord = await CordServiceInstance.createAnswer( req.id, data );
+    return res.send( resUtil.sendSuccess( updatedCord ) );
+  } catch ( err ) {
+    logger.error( err );
+    res.status( 500 ).send( resUtil.sendError( err ) );
+    throw err;
   }
 }
 
