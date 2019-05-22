@@ -68,9 +68,9 @@ class TeamService {
       && ObjectService.hasAllRequiredKeys( data, teamsKeyWhitelist.model );
 
     if ( !isValidId ) {
-      throw new Error( Messages.response.invalidIdProvided );
+      throw new Error( Messages.responses.invalidIdProvided );
     } else if ( !isValidBody ) {
-      throw new Error( Messages.response.invalidBodyProvided );
+      throw new Error( Messages.responses.invalidBodyProvided );
     } else {
       data = ObjectService.pick( data, teamsKeyWhitelist.model );
       return await this.mongooseServiceInstance.update( id, data );
@@ -100,13 +100,13 @@ class TeamService {
       && ObjectService.hasAllRequiredKeys( data.member, teamsKeyWhitelist.members );
 
     if ( !isValidId ) {
-      throw new Error( Messages.response.invalidIdProvided );
+      throw new Error( Messages.responses.invalidIdProvided );
     } else if ( !isValidBody ) {
-      throw new Error( Messages.response.invalidBodyProvided );
+      throw new Error( Messages.responses.invalidBodyProvided );
     } else if ( !isValidAction ) {
-      throw new Error( Messages.response.invalidActionProvided );
+      throw new Error( Messages.responses.invalidActionProvided );
     } else if ( !isValidMember ) {
-      throw new Error( Messages.response.invalidMemberProvided );
+      throw new Error( Messages.responses.invalidMemberProvided );
     } else {
       // Find the team to update members for
       const team = await this.mongooseServiceInstance.findById( id, { __v: 0 } );
