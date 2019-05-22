@@ -1,11 +1,20 @@
-const MongooseService = require( "./MongooseService" );
+const ObjectId = require( "mongoose" ).Types.ObjectId;
+const Messages = require( "../config/messages" );
+
+// For file uploads
 const loki = require( "lokijs" );
 const LokiService = require( "./LokiService" );
 const dbName = "db.json";
 const collectionName = "files";
 const uploadPath = "uploads";
 const db = new loki( `${uploadPath}/${dbName}`, { persistenceMethod: "fs" } );
-const ObjectId = require( "mongoose" ).Types.ObjectId;
+
+// Services
+const MongooseService = require( "./MongooseService" );
+const UserService = require( "./UserService" );
+
+// Models
+const Users = require( "../models/User" );
 
 class CordService {
   /**
@@ -16,6 +25,7 @@ class CordService {
     this.cordModel = CordModel;
 
     this.mongooseServiceInstance = new MongooseService( this.cordModel );
+    this.userServiceInstance = new UserService( Users );
   }
 
   /**
@@ -41,6 +51,71 @@ class CordService {
    */
   async create ( cord ) {
     return await this.mongooseServiceInstance.create( cord );
+  }
+
+  /**
+   * @description Add an answer to the cord matching the provided object id
+   * @param id {string} MongoDB Object ID for the cord to add the answer to
+   * @param data {object} Answer containing properties: user, and answer
+   * @returns {Promise<void>}
+   */
+  async createAnswer ( id, data ) {
+    // Determine if ID and Body provided
+    const isValidId = id && ObjectId.isValid( id );
+    const isValidBody = data && typeof data === "object";
+
+    // Determine if user and answer are provided and valid
+    const userIsProvided = isValidBody
+      && data.user
+      && typeof data.user === "object"
+      && data.user._id;
+    const answerIsProvided = isValidBody
+      && data.answer
+      && typeof data.answer === "string";
+
+    if ( !userIsProvided ) {
+      throw new Error( Messages.responses.userNotProvided );
+    } else if ( !answerIsProvided ) {
+      throw new Error( Messages.responses.answerNotProvided );
+    } else if ( !isValidId ) {
+      throw new Error( Messages.responses.invalidIdProvided );
+    } else if ( !isValidBody ) {
+      throw new Error( Messages.responses.invalidBodyProvided );
+    } else {
+      // Verify that the user provided exists
+      const user = await this.userServiceInstance.findById( data.user._id );
+
+      // No user exists with the provided ID
+      if ( !user ) {
+        throw new Error( Messages.responses.userNotFound );
+      }
+
+      // Retrieve the cord to add the answer to
+      let cord = await this.mongooseServiceInstance.findById( id, {}, {} );
+
+      // No cord exists with the provided ID
+      if ( !cord ) {
+        throw new Error( Messages.response.cordNotFound );
+      }
+
+      // Check that the cord is not resolved
+      const allowedStatus = "Open";
+      if ( cord.status !== allowedStatus ) {
+        throw new Error( Messages.responses.cordUneditable );
+      }
+
+      // Make sure that there is an answers property for the cord
+      if ( !( cord.answers && cord.answers.length >= 0 ) ) {
+        cord.answers = [];
+      }
+
+      // Add necessary  fields to answer
+      data.createdOn = new Date();
+      data._id = ObjectId();
+      cord.answers.push( data );
+
+      return await cord.save();
+    }
   }
 
   /**
