@@ -15,6 +15,7 @@ module.exports = {
   },
 
   responses: {
+    answerNotFound: "Answer not found with provided ID",
     answerNotProvided: "Answer is required",
     appTokenNotProvided: "appToken must be included in" +
       " querystring/params/body for request",
