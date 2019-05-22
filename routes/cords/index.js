@@ -85,6 +85,20 @@ router.post( "/answer/:id",
 );
 
 /**
+ * @method DELETE
+ * @description Remove an answer from a cord
+ * @param id {string} Object ID of the Cord to retrieve
+ * @param answerId {string} Object ID of the answer to delete
+ * @returns Status code 200 if successful with document, 500 if error
+ *   occurs
+ */
+router.delete( "/:id/answer/:answerId",
+  CordValidator.idIsPresent,
+  token.validateToken,
+  // auth.validateApp,
+  CordController.deleteAnswer
+);
+/**
  * @method GET
  * @description Retrieve a cord by the provided object id
  * @param id {string} Object ID of the Cord to retrieve

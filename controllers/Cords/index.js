@@ -1,19 +1,20 @@
 // Models
 const Cords = require( "../../models/Cords" );
+const CategoryList = require( "../../models/CategoryList/index.js" );
 const Notifications = require( "../../models/Notifications" );
 const Users = require( "../../models/User" );
-const CategoryList = require( "../../models/CategoryList/index.js" );
 
 // Services
 const CordService = require( "../../services/CordService" );
-const SlackService = require( "../../services/SlackService" );
 const NotificationService = require( "../../services/NotificationService" );
+const SlackService = require( "../../services/SlackService" );
 const UserService = require( "../../services/UserService" );
 
 // Utils
-const logger = require( "../../services/Logger" );
-const qUtil = require( "../../util/queryUtil" );
 const CordsWhitelist = require( "../../config/keysWhitelists/cords" );
+const logger = require( "../../services/Logger" );
+const Messages = require( "../../config/messages" );
+const qUtil = require( "../../util/queryUtil" );
 const Sentry = require( "@sentry/node" );
 
 // Middlewares
@@ -22,20 +23,20 @@ const resUtil = require( "../../middlewares/response" );
 // Required for retrieving uploaded files
 const path = require( "path" );
 const fs = require( "fs" );
-const ObjectService = require( "../../services/ObjectService" );
-const Messages = require( "../../config/messages" );
 const uploadPath = "uploads";
 
 // Create usable instance of services
-const CordServiceInstance = new CordService( Cords );
 const CategoryServiceInstance = new CordService( CategoryList );
+const CordServiceInstance = new CordService( Cords );
 const NotificationServiceInstance = new NotificationService( Notifications );
-const UserServiceInstance = new UserService( Users );
+const ObjectService = require( "../../services/ObjectService" );
 const SlackServiceInstance = new SlackService();
+const UserServiceInstance = new UserService( Users );
 
 module.exports = {
   createAnswer,
   createCord,
+  deleteAnswer,
   deleteCord,
   getCategoryList,
   getCordById,
@@ -55,143 +56,6 @@ Sentry.configureScope( scope => {
 } );
 
 /**
- * @description Retrieve one or many cords. Accepts an optional JSON query
- * to be performed on the Mongo Collection
- * @param req
- * @param res
- * @returns {Promise<*>}
- */
-async function getCords ( req, res ) {
-  const queryStrings = qUtil.getDbQueryStrings( req.query );
-
-  try {
-    const data = await CordServiceInstance.find( queryStrings.query );
-    return res.send( resUtil.sendSuccess( data ) );
-  } catch ( err ) {
-    logger.error( err );
-    res.status( 500 ).send( resUtil.sendError( err ) );
-
-    // Capture the error with users information provided
-    Sentry.withScope( scope => {
-      scope.setTag( "query", queryStrings.query );
-      Sentry.captureException( err );
-    } );
-  }
-}
-
-/**
- * @description Retrieve items from the Category Collection
- * @param req
- * @param res
- * @returns {Promise<*>}
- */
-async function getCategoryList ( req, res ) {
-  try {
-    const query = {};
-    const data = await CategoryServiceInstance.getCategoryList( query );
-    return res.send( resUtil.sendSuccess( data ) );
-  } catch ( err ) {
-    logger.error( err );
-    res.status( 500 ).send( resUtil.sendError( err ) );
-    throw err;
-  }
-}
-
-/**
- * @description Retrieve a single cord by the Object ID
- * @param req
- * @param res
- * @returns {Promise<*>}
- */
-async function getCordById ( req, res ) {
-  try {
-    const data = await CordServiceInstance.findById( req.id );
-    return res.send( resUtil.sendSuccess( data ) );
-  } catch ( err ) {
-    logger.error( err );
-    res.status( 500 ).send( resUtil.sendError( err ) );
-
-    // Capture the error with users information provided
-    Sentry.withScope( scope => {
-      scope.setTag( "id", req.id );
-      Sentry.captureException( err );
-    } );
-  }
-}
-
-/**
- * @description Retrieve one or many cords by their status
- * @param req
- * @param res
- * @returns {Promise<*>}
- */
-async function getCordByStatus ( req, res ) {
-  const query = { status: req.status };
-
-  try {
-    const data = await CordServiceInstance.find( query, { openedOn: -1 } );
-    return res.send( resUtil.sendSuccess( data ) );
-  } catch ( err ) {
-    logger.error( err );
-    res.status( 500 ).send( resUtil.sendError( err ) );
-
-    // Capture the error with users information provided
-    Sentry.withScope( scope => {
-      scope.setTag( "status", req.status );
-      Sentry.captureException( err );
-    } );
-  }
-}
-
-/**
- * @description Retrieve cords by their status and by the users who pulled
- * the cord
- * @param req
- * @param res
- * @returns {Promise<*>}
- */
-async function getCordForUser ( req, res ) {
-  const status = req.query.status || req.params.status || "Open";
-  const query = { puller: req.user, status };
-
-  try {
-    const data = await CordServiceInstance.find( query, { openedOn: -1 } );
-    return res.send( resUtil.sendSuccess( data ) );
-  } catch ( err ) {
-    logger.error( err );
-    res.status( 500 ).send( resUtil.sendError( err ) );
-
-    // Capture the error with users information provided
-    Sentry.withScope( scope => {
-      scope.setUser( req.user );
-      Sentry.captureException( err );
-    } );
-  }
-}
-
-/**
- * @description Retrieve users statistics for cord related data
- * @param req
- * @param res
- * @returns {Promise<*>}
- */
-async function getUserStats ( req, res ) {
-  try {
-    const data = await CordServiceInstance.getUserStats( req.user );
-    return res.send( resUtil.sendSuccess( data ) );
-  } catch ( err ) {
-    logger.error( err );
-    res.status( 500 ).send( resUtil.sendError( err ) );
-
-    // Capture the error with users information provided
-    Sentry.withScope( scope => {
-      scope.setUser( req.user );
-      Sentry.captureException( err );
-    } );
-  }
-}
-
-/**
  * @description Create an answer for a cord with the provided body
  * @param req
  * @param res
@@ -205,7 +69,7 @@ async function createAnswer ( req, res ) {
     return res.send( resUtil.sendSuccess( updatedCord ) );
   } catch ( err ) {
     logger.error( err );
-    res.status( 500 ).send( resUtil.sendError( err ) );
+    res.status( 500 ).send( resUtil.sendError( err.message ) );
     throw err;
   }
 }
@@ -241,8 +105,237 @@ async function createCord ( req, res ) {
     return res.send( resUtil.sendSuccess( responseBody ) );
   } catch ( err ) {
     logger.error( err );
-    res.status( 500 ).send( resUtil.sendError( err ) );
+    res.status( 500 ).send( resUtil.sendError( err.message ) );
     throw err;
+  }
+}
+
+/**
+ * @description Delete an answer for a cord matching the provided ID
+ * @param req
+ * @param res
+ * @returns {Promise<*>}
+ */
+async function deleteAnswer ( req, res ) {
+  try {
+    // Remove keys that are not allowed
+    const updatedCord = await CordServiceInstance.deleteAnswer( req.id, req.params.answerId );
+    return res.send( resUtil.sendSuccess( updatedCord ) );
+  } catch ( err ) {
+    logger.error( err );
+    res.status( 500 ).send( resUtil.sendError( err.message ) );
+    throw err;
+  }
+}
+
+/**
+ * @description Delete a cord matching the provided ID
+ * @param req
+ * @param res
+ * @returns {Promise<*>}
+ */
+async function deleteCord ( req, res ) {
+  try {
+    const data = await CordServiceInstance.delete( req.id );
+    return res.send( resUtil.sendSuccess( data ) );
+  } catch ( err ) {
+    logger.error( err );
+    res.status( 500 ).send( resUtil.sendError( err.message ) );
+
+    // Capture the error with users information provided
+    Sentry.withScope( scope => {
+      scope.setTag( "id", req.id );
+      Sentry.captureException( err );
+    } );
+  }
+}
+
+/**
+ * @description Retrieve items from the Category Collection
+ * @param req
+ * @param res
+ * @returns {Promise<*>}
+ */
+async function getCategoryList ( req, res ) {
+  try {
+    const query = {};
+    const data = await CategoryServiceInstance.getCategoryList( query );
+    return res.send( resUtil.sendSuccess( data ) );
+  } catch ( err ) {
+    logger.error( err );
+    res.status( 500 ).send( resUtil.sendError( err.message ) );
+    throw err;
+  }
+}
+
+/**
+ * @description Retrieve one or many cords. Accepts an optional JSON query
+ * to be performed on the Mongo Collection
+ * @param req
+ * @param res
+ * @returns {Promise<*>}
+ */
+async function getCords ( req, res ) {
+  const queryStrings = qUtil.getDbQueryStrings( req.query );
+
+  try {
+    const data = await CordServiceInstance.find( queryStrings.query );
+    return res.send( resUtil.sendSuccess( data ) );
+  } catch ( err ) {
+    logger.error( err );
+    res.status( 500 ).send( resUtil.sendError( err.message ) );
+
+    // Capture the error with users information provided
+    Sentry.withScope( scope => {
+      scope.setTag( "query", queryStrings.query );
+      Sentry.captureException( err );
+    } );
+  }
+}
+
+/**
+ * @description Retrieve a single cord by the Object ID
+ * @param req
+ * @param res
+ * @returns {Promise<*>}
+ */
+async function getCordById ( req, res ) {
+  try {
+    const data = await CordServiceInstance.findById( req.id );
+    return res.send( resUtil.sendSuccess( data ) );
+  } catch ( err ) {
+    logger.error( err );
+    res.status( 500 ).send( resUtil.sendError( err.message ) );
+
+    // Capture the error with users information provided
+    Sentry.withScope( scope => {
+      scope.setTag( "id", req.id );
+      Sentry.captureException( err );
+    } );
+  }
+}
+
+/**
+ * @description Retrieve one or many cords by their status
+ * @param req
+ * @param res
+ * @returns {Promise<*>}
+ */
+async function getCordByStatus ( req, res ) {
+  const query = { status: req.status };
+
+  try {
+    const data = await CordServiceInstance.find( query, { openedOn: -1 } );
+    return res.send( resUtil.sendSuccess( data ) );
+  } catch ( err ) {
+    logger.error( err );
+    res.status( 500 ).send( resUtil.sendError( err.message ) );
+
+    // Capture the error with users information provided
+    Sentry.withScope( scope => {
+      scope.setTag( "status", req.status );
+      Sentry.captureException( err );
+    } );
+  }
+}
+
+/**
+ * @description Retrieve cords by their status and by the users who pulled
+ * the cord
+ * @param req
+ * @param res
+ * @returns {Promise<*>}
+ */
+async function getCordForUser ( req, res ) {
+  const status = req.query.status || req.params.status || "Open";
+  const query = { puller: req.user, status };
+
+  try {
+    const data = await CordServiceInstance.find( query, { openedOn: -1 } );
+    return res.send( resUtil.sendSuccess( data ) );
+  } catch ( err ) {
+    logger.error( err );
+    res.status( 500 ).send( resUtil.sendError( err.message ) );
+
+    // Capture the error with users information provided
+    Sentry.withScope( scope => {
+      scope.setUser( req.user );
+      Sentry.captureException( err );
+    } );
+  }
+}
+
+/**
+ * @description Retrieve all files for a cord matching the provided ID
+ * @param req
+ * @param res
+ * @returns {Promise<*>}
+ */
+async function getFilesByCordId ( req, res ) {
+  try {
+    const projection = { files: 1 };
+    const data = await CordServiceInstance.getFilesByCordId( req.id, projection );
+
+    return res.send( resUtil.sendSuccess( data ) );
+  } catch ( err ) {
+    logger.error( err );
+    res.status( 500 ).send( resUtil.sendError( err.message ) );
+
+    // Capture the error with users information provided
+    Sentry.withScope( scope => {
+      scope.setTag( "id", req.id );
+      Sentry.captureException( err );
+    } );
+  }
+}
+
+/**
+ * @description Retrieve a single file by ID
+ * @param req
+ * @param res
+ * @returns {Promise<*>}
+ */
+async function getFile ( req, res ) {
+  const fileName = req.query.id || req.params.id || null;
+
+  if ( fileName ) {
+    try {
+      const result = await CordService.getFile( fileName );
+
+      if ( !result ) {
+        return res.sendStatus( 404 );
+      }
+
+      res.setHeader( "Content-Type", result.mimetype );
+      fs.createReadStream( path.join( uploadPath, result.filename ) ).pipe( res );
+    } catch ( err ) {
+      res.status( 500 ).send( resUtil.sendError( err.message ) );
+      throw err;
+    }
+  } else {
+    return res.status( 400 ).send( resUtil.sendError( Messages.responses.idNotProvided ) );
+  }
+}
+
+/**
+ * @description Retrieve users statistics for cord related data
+ * @param req
+ * @param res
+ * @returns {Promise<*>}
+ */
+async function getUserStats ( req, res ) {
+  try {
+    const data = await CordServiceInstance.getUserStats( req.user );
+    return res.send( resUtil.sendSuccess( data ) );
+  } catch ( err ) {
+    logger.error( err );
+    res.status( 500 ).send( resUtil.sendError( err.message ) );
+
+    // Capture the error with users information provided
+    Sentry.withScope( scope => {
+      scope.setUser( req.user );
+      Sentry.captureException( err );
+    } );
   }
 }
 
@@ -268,7 +361,7 @@ async function updateCord ( req, res ) {
     return res.send( resUtil.sendSuccess( notificationResult ) );
   } catch ( err ) {
     logger.error( err );
-    res.status( 500 ).send( resUtil.sendError( err ) );
+    res.status( 500 ).send( resUtil.sendError( err.message ) );
 
     // Capture the error with users information provided
     Sentry.withScope( scope => {
@@ -296,7 +389,7 @@ async function updateRescuers ( req, res ) {
       return res.send( resUtil.sendSuccess( data ) );
     } catch ( err ) {
       logger.error( err );
-      res.status( 500 ).send( resUtil.sendError( err ) );
+      res.status( 500 ).send( resUtil.sendError( err.message ) );
 
       // Capture the error with users information provided
       Sentry.withScope( scope => {
@@ -309,13 +402,20 @@ async function updateRescuers ( req, res ) {
   }
 }
 
+/**
+ * @description Upload a file and associate it to the cord matching the
+ * provided ID
+ * @param req
+ * @param res
+ * @returns {Promise<*>}
+ */
 async function upload ( req, res ) {
   try {
     const data = await CordServiceInstance.upload( req.id, req.file );
     return res.send( resUtil.sendSuccess( data ) );
   } catch ( err ) {
     logger.error( err );
-    res.status( 500 ).send( resUtil.sendError( err ) );
+    res.status( 500 ).send( resUtil.sendError( err.message ) );
 
     // Capture the error with users information provided
     Sentry.withScope( scope => {
@@ -325,58 +425,3 @@ async function upload ( req, res ) {
   }
 }
 
-async function getFilesByCordId ( req, res ) {
-  try {
-    const projection = { files: 1 };
-    const data = await CordServiceInstance.getFilesByCordId( req.id, projection );
-
-    return res.send( resUtil.sendSuccess( data ) );
-  } catch ( err ) {
-    logger.error( err );
-    res.status( 500 ).send( resUtil.sendError( err ) );
-
-    // Capture the error with users information provided
-    Sentry.withScope( scope => {
-      scope.setTag( "id", req.id );
-      Sentry.captureException( err );
-    } );
-  }
-}
-
-async function getFile ( req, res ) {
-  const fileName = req.query.id || req.params.id || null;
-
-  if ( fileName ) {
-    try {
-      const result = await CordService.getFile( fileName );
-
-      if ( !result ) {
-        return res.sendStatus( 404 );
-      }
-
-      res.setHeader( "Content-Type", result.mimetype );
-      fs.createReadStream( path.join( uploadPath, result.filename ) ).pipe( res );
-    } catch ( err ) {
-      res.status( 500 ).send( resUtil.sendError( err ) );
-      throw err;
-    }
-  } else {
-    return res.status( 400 ).send( resUtil.sendError( Messages.responses.idNotProvided ) );
-  }
-}
-
-async function deleteCord ( req, res ) {
-  try {
-    const data = await CordServiceInstance.delete( req.id );
-    return res.send( resUtil.sendSuccess( data ) );
-  } catch ( err ) {
-    logger.error( err );
-    res.status( 500 ).send( resUtil.sendError( err ) );
-
-    // Capture the error with users information provided
-    Sentry.withScope( scope => {
-      scope.setTag( "id", req.id );
-      Sentry.captureException( err );
-    } );
-  }
-}

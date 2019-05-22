@@ -119,6 +119,54 @@ class CordService {
   }
 
   /**
+   * @description Remove an answer from the cord matching the provided object id
+   * @param id {string} MongoDB Object ID for the cord to remove the answer from
+   * @param answerId {string} MongoDB Object ID for the answer to remove
+   * @returns {Promise<void>}
+   */
+  async deleteAnswer ( id, answerId ) {
+    // Determine if ID and Body provided
+    const isValidId = id && ObjectId.isValid( id );
+    const isValidAnswerId = answerId && ObjectId.isValid( answerId );
+
+    if ( !isValidId ) {
+      throw new Error( Messages.responses.invalidIdProvided );
+    } else if ( !isValidAnswerId ) {
+      throw new Error( Messages.responses.invalidIdProvided );
+    } else {
+      // Retrieve the cord to delete the answer from
+      let cord = await this.mongooseServiceInstance.findById( id, {}, {} );
+
+      // No cord exists with the provided ID
+      if ( !cord ) {
+        throw new Error( Messages.response.cordNotFound );
+      }
+
+      // Check that the cord is not resolved
+      const allowedStatus = "Open";
+      if ( cord.status !== allowedStatus ) {
+        throw new Error( Messages.responses.cordUneditable );
+      }
+
+      // Make sure that there is an answers property for the cord
+      if ( !( cord.answers || cord.answers.length ) ) {
+        throw new Error( Messages.responses.answerNotFound );
+      }
+
+      // Find the answer to delete
+      const answerIndex = cord.answers.findIndex( elem => elem._id.equals( answerId ) );
+
+      if ( answerIndex !== -1 ) {
+        cord.answers.splice( answerIndex, 1 );
+      } else {
+        throw new Error( Messages.responses.answerNotFound );
+      }
+
+      return await cord.save();
+    }
+  }
+
+  /**
    * @description Retrieve list of distinct values for the field, in
    * documents returned form the provided query
    * @param query {object} Required: Query to execute on the Collection
