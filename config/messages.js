@@ -19,6 +19,8 @@ module.exports = {
     appTokenNotProvided: "appToken must be included in" +
       " querystring/params/body for request",
     bodyNotProvided: "Valid request body not provided",
+    cordNotFound: "Cord not found with provided ID",
+    cordUneditable: "Cord is not in an editable state",
     errorParsingObject: "Invalid JSON object provided",
     fileNotProvided: "Valid file not provided",
     idNotProvided: "Valid request ID not provided",
@@ -28,6 +30,7 @@ module.exports = {
     invalidMemberProvided: "Invalid team member provided",
     statusNotProvided: "Valid status not provided",
     teamNotFound: "Team not found with provided ID",
+    userNotFound: "User not found with provided ID",
     userNotProvided: "Valid user not provided"
   }
 };
