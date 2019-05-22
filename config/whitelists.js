@@ -1,5 +1,10 @@
 module.exports = {
   cords: {
+    answer: [
+      "answer",
+      "user"
+    ],
+
     model: [
       "status",
       "description",
