@@ -68,6 +68,22 @@ router.get( "/files/:id",
   auth.validateApp,
   CordController.getFilesByCordId
 );
+
+/**
+ * @method POST
+ * @description Add an answer to a cord
+ * @param id {string} Object ID of the Cord to retrieve
+ * @returns Status code 200 if successful with document, 500 if error
+ *   occurs
+ */
+router.post( "/answer/:id",
+  CordValidator.idIsPresent,
+  CordValidator.bodyIsPresent,
+  token.validateToken,
+  auth.validateApp,
+  CordController.createAnswer
+);
+
 /**
  * @method GET
  * @description Retrieve a cord by the provided object id
