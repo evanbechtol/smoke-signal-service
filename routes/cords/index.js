@@ -1,5 +1,5 @@
 const express = require( "express" );
-const auth = require( "../../middlewares/eAuth" );
+// const auth = require( "../../middlewares/eAuth" );
 const token = require( "../../middlewares/token" );
 const CordController = require( "../../controllers/Cords" );
 const CordValidator = require( "../../middlewares/validators/Cords" );
@@ -20,7 +20,7 @@ const router = express.Router();
  */
 router.get( "/",
   token.validateToken,
-  auth.validateApp,
+  // auth.validateApp,
   CordController.getCords
 );
 
@@ -34,7 +34,7 @@ router.get( "/",
 router.post( "/",
   CordValidator.bodyIsPresent,
   token.validateToken,
-  auth.validateApp,
+  // auth.validateApp,
   CordController.createCord
 );
 
@@ -48,7 +48,7 @@ router.post( "/",
 router.post( "/upload/:id",
   CordValidator.idIsPresent,
   token.validateToken,
-  auth.validateApp,
+  // auth.validateApp,
   upload.single( "cordFile" ),
   CordValidator.fileIsPresent,
   CordController.upload
@@ -65,7 +65,7 @@ router.post( "/upload/:id",
 router.get( "/files/:id",
   CordValidator.idIsPresent,
   token.validateToken,
-  auth.validateApp,
+  // auth.validateApp,
   CordController.getFilesByCordId
 );
 
@@ -80,7 +80,7 @@ router.post( "/answer/:id",
   CordValidator.idIsPresent,
   CordValidator.bodyIsPresent,
   token.validateToken,
-  auth.validateApp,
+  // auth.validateApp,
   CordController.createAnswer
 );
 
@@ -108,7 +108,7 @@ router.delete( "/:id/answer/:answerId",
 router.get( "/:id",
   CordValidator.idIsPresent,
   token.validateToken,
-  auth.validateApp,
+  // auth.validateApp,
   CordController.getCordById
 );
 
@@ -123,7 +123,7 @@ router.put( "/:id",
   CordValidator.idIsPresent,
   CordValidator.bodyIsPresent,
   token.validateToken,
-  auth.validateApp,
+  // auth.validateApp,
   CordController.updateCord
 );
 
@@ -138,7 +138,7 @@ router.put( "/:id",
 router.delete( "/:id",
   CordValidator.idIsPresent,
   token.validateToken,
-  auth.validateApp,
+  // auth.validateApp,
   CordController.deleteCord
 );
 
@@ -152,7 +152,7 @@ router.delete( "/:id",
 router.get( "/status/:status",
   CordValidator.statusIsPresent,
   token.validateToken,
-  auth.validateApp,
+  // auth.validateApp,
   CordController.getCordByStatus
 );
 
@@ -166,7 +166,7 @@ router.get( "/status/:status",
 router.get( "/user/:user",
   CordValidator.userIsPresent,
   token.validateToken,
-  auth.validateApp,
+  // auth.validateApp,
   CordController.getCordForUser
 );
 
@@ -180,7 +180,7 @@ router.get( "/user/:user",
 router.get( "/stats/:user",
   CordValidator.userIsPresent,
   token.validateToken,
-  auth.validateApp,
+  // auth.validateApp,
   CordController.getUserStats
 );
 
@@ -197,7 +197,7 @@ router.put( "/rescuers/:id",
   CordValidator.idIsPresent,
   CordValidator.bodyIsPresent,
   token.validateToken,
-  auth.validateApp,
+  // auth.validateApp,
   CordController.updateRescuers
 );
 
@@ -209,7 +209,7 @@ router.put( "/rescuers/:id",
  */
 router.get( "/category/list",
   token.validateToken,
-  auth.validateApp,
+  // auth.validateApp,
   CordController.getCategoryList
 );
 
