@@ -82,14 +82,6 @@ class CordService {
     } else if ( !isValidBody ) {
       throw new Error( Messages.responses.invalidBodyProvided );
     } else {
-      // Verify that the user provided exists
-      const user = await this.userServiceInstance.findById( data.user._id );
-
-      // No user exists with the provided ID
-      if ( !user ) {
-        throw new Error( Messages.responses.userNotFound );
-      }
-
       // Retrieve the cord to add the answer to
       let cord = await this.mongooseServiceInstance.findById( id, {}, {} );
 
