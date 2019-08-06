@@ -16,7 +16,6 @@ let router = express.Router();
  */
 router.get( "/",
   token.validateToken,
-  auth.validateApp,
   appsController.getApps
 );
 
