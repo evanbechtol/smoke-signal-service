@@ -46,6 +46,7 @@ module.exports = {
   getFile,
   getFilesByCordId,
   getUserStats,
+  updateAnswer,
   updateCord,
   updateRescuers,
   upload
@@ -334,6 +335,46 @@ async function getUserStats ( req, res ) {
     // Capture the error with users information provided
     Sentry.withScope( scope => {
       scope.setUser( req.user );
+      Sentry.captureException( err );
+    } );
+  }
+}
+
+/**
+ * @description Update a answer with the provided keys
+ * @param req
+ * @param res
+ * @returns {Promise<*>}
+ */
+async function updateAnswer ( req, res ) {
+  try {
+    // Retrieve the cord
+    let retrievedCord = await CordServiceInstance.findOne( { _id: req.id }, {}, { lean: false } );
+
+    // No matching cord was found
+    if ( !retrievedCord ) {
+      return res.status( 404 ).send( resUtil.sendError( Messages.responses.cordNotFound ) );
+    }
+
+    // Find the answer and update
+    retrievedCord.answers = retrievedCord.answers.map( answer => {
+      if ( answer._id.toString() === req.body._id ) {
+        return req.body;
+      }
+      return answer;
+    } );
+
+    // Save changes to database
+    const updatedCord = await retrievedCord.save();
+
+    return res.send( resUtil.sendSuccess( updatedCord ) );
+  } catch ( err ) {
+    logger.error( err );
+    res.status( 500 ).send( resUtil.sendError( err.message ) );
+
+    // Capture the error with users information provided
+    Sentry.withScope( scope => {
+      scope.setTag( "id", req.id );
       Sentry.captureException( err );
     } );
   }

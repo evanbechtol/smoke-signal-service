@@ -193,6 +193,23 @@ router.get( "/stats/:user",
  * @returns Status code 200 if successful with updated document, 500 if error
  *   occurs
  */
+router.put( "/answer/:id",
+  CordValidator.idIsPresent,
+  CordValidator.bodyIsPresent,
+  token.validateToken,
+  // auth.validateApp,
+  CordController.updateAnswer
+);
+
+/**
+ * @method PUT
+ * @description Update a cord's rescuers, provided that all required keys are
+ *   provided
+ * @param id {string} Object ID of document to update
+ * @param body {object} Body to update document with
+ * @returns Status code 200 if successful with updated document, 500 if error
+ *   occurs
+ */
 router.put( "/rescuers/:id",
   CordValidator.idIsPresent,
   CordValidator.bodyIsPresent,

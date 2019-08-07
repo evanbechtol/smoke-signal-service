@@ -192,10 +192,11 @@ class CordService {
    * @description Retrieve a single document by query
    * @param query {object} Required: Mongoose query object
    * @param  projection [object] Optional: Mongoose query object
+   * @param  options [object] Optional: Mongoose query object
    * @returns {Promise<void>}
    */
-  async findOne ( query, projection = { __v: 0 } ) {
-    return await this.mongooseServiceInstance.findOne( query, projection );
+  async findOne ( query, projection, options ) {
+    return await this.mongooseServiceInstance.findOne( query, projection, options );
   }
 
   /**
