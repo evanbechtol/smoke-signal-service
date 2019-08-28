@@ -85,6 +85,12 @@ async function createCord ( req, res ) {
   try {
     // Create Cord
     const body = ObjectService.pick( req.body, CordsWhitelist.post );
+
+    // Make sure that answers property exists
+    if ( !body.answers ) {
+      body.answers = [];
+    }
+
     const createdCord = await CordServiceInstance.create( body );
 
     // Retrieve User Apps
@@ -96,7 +102,7 @@ async function createCord ( req, res ) {
 
     // Send Slack message
     req.body.header = req.header( "Referer" );
-    //await SlackServiceInstance.sendNotification( req.body, true );
+    await SlackServiceInstance.sendNotification( req.body, true );
 
     // Create Notification
     createdCord.subject = Messages.notifications.cordCreated;
