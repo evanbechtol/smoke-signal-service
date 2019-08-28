@@ -33,6 +33,7 @@ module.exports = {
     "title"
   ],
   put: [
+    "answers",
     "app",
     "category",
     "description",
