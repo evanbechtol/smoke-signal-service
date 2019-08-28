@@ -21,6 +21,7 @@ module.exports = {
   ],
 
   post: [
+    "answers",
     "app",
     "category",
     "description",
