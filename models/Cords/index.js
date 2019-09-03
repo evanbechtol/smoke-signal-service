@@ -118,6 +118,11 @@ const schema = mongoose.Schema( {
   answers: {
     type: Array,
     default: []
+  },
+
+  votes: {
+    type: Array,
+    default: []
   }
 } );
 
