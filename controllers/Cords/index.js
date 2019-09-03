@@ -86,11 +86,6 @@ async function createCord ( req, res ) {
     // Create Cord
     const body = ObjectService.pick( req.body, CordsWhitelist.post );
 
-    // Make sure that answers property exists
-    if ( !body.answers ) {
-      body.answers = [];
-    }
-
     const createdCord = await CordServiceInstance.create( body );
 
     // Retrieve User Apps

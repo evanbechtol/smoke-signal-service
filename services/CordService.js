@@ -50,6 +50,12 @@ class CordService {
    * @returns {Promise} Returns result of Mongoose query
    */
   async create ( cord ) {
+
+    // Make sure that answers property exists
+    if ( !cord.answers ) {
+      cord.answers = [];
+    }
+
     return await this.mongooseServiceInstance.create( cord );
   }
 
