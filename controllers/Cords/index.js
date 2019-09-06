@@ -66,6 +66,15 @@ async function createAnswer ( req, res ) {
   try {
     // Remove keys that are not allowed
     const data = ObjectService.pick( req.body, CordsWhitelist.answer );
+
+    if ( !data.likes ) {
+      data.likes = 0;
+    }
+
+    if ( !data.votes ) {
+      data.votes = [];
+    }
+
     const updatedCord = await CordServiceInstance.createAnswer( req.id, data );
     return res.send( resUtil.sendSuccess( updatedCord ) );
   } catch ( err ) {

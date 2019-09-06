@@ -1,7 +1,9 @@
 module.exports = {
   answer: [
     "answer",
-    "user"
+    "likes",
+    "user",
+    "votes"
   ],
 
   get: [
